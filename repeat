@@ -1,0 +1,20 @@
+# Print $1 copies of $2
+# https://stackoverflow.com/questions/5349718/how-can-i-repeat-a-character-in-bash#comment30547785_5349842
+# - the `eval` is necessary because the shell doesn't parse variables when
+#   handling the {A..B} construct
+
+function repeat {
+    CNT="${1:?repeat(): no count specified}"
+    STR="${2:?repeat(): missing or empty string}"
+
+    printf -- "$STR"'%.s' $( eval "echo {1.." $(($CNT)) "}" )
+}
+
+# Simpler options
+# - these work because printf uses empty string if input arg is missing
+
+# if repeating string is only one character
+printf '%*s' "$LEN" | tr ' ' '-'
+
+# if repeating string is multiple characters
+printf '%*s' "$LEN" | sed "s/ /abc/g"

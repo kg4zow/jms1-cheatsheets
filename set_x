@@ -1,0 +1,25 @@
+########################################
+# Maybe print a command before executing it
+
+SET_X="${SET_X:-false}"
+
+function set_x {
+    local IFS=' '
+    if [[ "${SET_X:-false}" == "true" ]]
+    then
+        echo "$PS4$*" 1>&2
+    fi
+    "$@"
+}
+
+########################################
+# Show the same output that set_x would show,
+# but don't actually run the command
+
+function show_x {
+    local IFS=' '
+    if [[ "${SET_X:-false}" == "true" ]]
+    then
+        echo "$PS4$*" 1>&2
+    fi
+}

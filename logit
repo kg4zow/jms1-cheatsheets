@@ -1,0 +1,16 @@
+# Simple logging function
+# - sends output to $LOG_FILE if defined, or STDOUT if not
+# - adds timestamps before each line in the message
+
+function logit {
+    MSG="${*:-}"
+
+    NOW="$( date '+%Y-%m-%dT%H:%M:%S%z' )"
+
+    if [[ -n "$LOG_FILE" ]]
+    then
+        echo "$MSG" | sed "s/^/${NOW} /" >> "$LOG_FILE"
+    else
+        echo "$MSG" | sed "s/^/${NOW} /"
+    fi
+}

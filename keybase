@@ -1,0 +1,47 @@
+---
+tags :
+  - keybase
+  - jms1
+---
+# Show my Keybase username. Exits non-zero if not logged in.
+keybase whoami
+
+# Create a new Keybase account. This computer will be the first device.
+keybase signup
+
+# Log in.
+keybase login
+
+# Create a paperkey. (Just *does* it without prompting.)
+keybase paperkey
+
+# List teams that you are a member of.
+keybase team list-memberships
+
+# List teams that another user is a member of.
+keybase team list-memberships -u <user>
+
+# Add an existing PGP key to your Keybase account, from local keyring.
+keybase pgp select [--multi]
+
+# Remove a PGP key from your Keybase account.
+keybase pgp list                # get "Keybase Key ID:"
+keybase pgp drop <key-id>
+
+# Update Keybase after updating your PGP public keys.
+keybase pgp update
+
+# Download any updated PGP keys for people you follow.
+keybase pgp pull
+
+# Send a Keybase chat message to a user.
+keybase chat send --private <yourname>,<theirname> "Hello world"
+
+# Send a Keybase chat message to a team.
+keybase chat send --private <teamname> "Hello world"
+
+# Send an exploding chat message
+keybase chat send --exploding-lifetime '30s' ...
+
+# Send an attachment
+keybase chat upload [--title xxx] --private <destination> <filename>

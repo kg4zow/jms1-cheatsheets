@@ -1,0 +1,47 @@
+###############################################################################
+# Dump an array's contents
+# call with a list of items, i.e.
+#   debug_array_items "${ARRAY_NAME[@]}"
+
+function debug_array_items {
+    local A C L X
+
+    A=( "$@" )
+
+    C=${#A[@]}
+    echo "DEBUG count=$C"
+
+    if (( C > 0 ))
+    then
+        L="${#C}"
+        for X in $( seq 0 "$((C-1))" )
+        do
+            printf 'DEBUG [%*d]="%s"\n' "$L" "$X" "${A[$X]}"
+        done
+    fi
+}
+
+###############################################################################
+# Dump an array by name
+# call with the array's name, i.e.
+#   debug_array_name ARRAY_NAME
+
+function debug_array_name {
+    local A C L N T X
+
+    N="$1"
+    T="${N}[@]"
+    A=( "${!T}" )
+
+    C=${#A[@]}
+    echo "DEBUG \${#${N}}=$C"
+
+    if (( C > 0 ))
+    then
+        L="${#C}"
+        for X in $( seq 0 "$((C-1))" )
+        do
+            printf 'DEBUG ${%s[%*d]}="%s"\n' "$N" "$L" "$X" "${A[$X]}"
+        done
+    fi
+}

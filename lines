@@ -1,0 +1,69 @@
+# Shell functions to emit coloured lines
+
+function redline {
+    if [[ -t 1 ]]
+    then
+        printf "\e[0;1;37;41m%s\e[0K\e[0m\n" "$*"
+    else
+        echo "***** $* *****"
+    fi
+}
+
+function yellowline {
+    if [[ -t 1 ]]
+    then
+        printf "\e[0;30;43m%s\e[K\e[0m\n" "$*"
+    else
+        echo "===== $* ====="
+    fi
+}
+
+function blueline {
+    if [[ -t 1 ]]
+    then
+        printf "\e[0;1;37;44m%s\e[0K\e[0m\n" "$*"
+    else
+        echo "===== $* ====="
+    fi
+}
+
+function greenline {
+    if [[ -t 1 ]]
+    then
+        printf "\e[0;1;37;42m%s\e[0K\e[0m\n" "$*"
+    else
+        echo "----- $* -----"
+    fi
+}
+
+function cyanline {
+    if [[ -t 1 ]]
+    then
+        printf "\e[0;1;37;46m%s\e[0K\e[0m\n" "$*"
+    else
+        echo "===== $* ====="
+    fi
+}
+
+function purpleline {
+    if [[ -t 1 ]]
+    then
+        printf "\e[0;1;37;45m%s\e[0K\e[0m\n" "$*"
+    else
+        echo "===== $* ====="
+    fi
+}
+
+function whiteline {
+    if [[ -t 1 ]]
+    then
+        printf "\e[0;1;37;47m%s\e[0K\e[0m\n" "$*"
+    else
+        echo "===== $* ====="
+    fi
+}
+
+function fail {
+    redline "$@"
+    exit 1
+}

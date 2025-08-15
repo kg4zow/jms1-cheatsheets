@@ -1,0 +1,2 @@
+# Send all script output to `logger`
+exec 1> >( logger -t "$( basename "$0" )" ) 2>&1

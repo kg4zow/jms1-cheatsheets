@@ -1,0 +1,12 @@
+# yaml2json
+ruby -ryaml -rjson -e 'puts JSON.pretty_generate(YAML.load(ARGF))' "$@"
+
+# json2yaml
+ruby -rjson -ryaml -e 'puts JSON.load(ARGF).to_yaml' "$@"
+
+# Canonicalize YAML (removes coments but does not sort items?)
+ruby -ryaml -e 'puts YAML.load(ARGF).to_yaml' "$@"
+
+# Canonicalize YAML using yq (works)
+# - brew install yq
+yq -P 'sort_keys(..) comments=""' "$@"

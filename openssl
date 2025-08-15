@@ -1,0 +1,31 @@
+---
+syntax  : bash
+tags    : [ shell ]
+---
+# Show full contents of an SSL certificate
+# - works with both PEM and DER encoded certificates
+openssl x509 -noout -text -in <file>
+
+# Show just subject and start/end dates
+openssl x509 -noout -subject -dates -in <file>
+
+# Verify that a key and certificate "match" each other
+# - both commands should output the same number
+openssl rsa  -noout -modulus -in <input.key>
+openssl x509 -noout -modulus -in <input.cer>
+
+# Sequence of commands to generate a CSR
+openssl genrsa -nodes -out new.key 2048
+openssl req -new -key new.key -out new.csr
+
+# Single command to generate a self-signed key/cert pair expiring in 20 years
+openssl req -x509 -sha256 \
+    -newkey rsa:4096 \
+    -nodes  \
+    -keyout dummy.key \
+    -days   7315 \
+    -subj   "/CN=hostname.domain.xyz" \
+    -out    dummy.cer
+
+# This file is in the /keybase/team/jms1team/cheatsheets/ directory.
+# Run `cheat -p community openssl` to see the version from the community repo.

@@ -1,0 +1,186 @@
+#!/bin/bash
+#
+# script-name
+# Author <email@example.com> 2020-02-02
+# Last updated 2021-12-12
+#
+# Quick description of what the script does.
+
+########################################
+# Global variables
+
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/scriptname"
+CONFIG_FILE="${CONFIG_DIR}/filename"
+
+###############################################################################
+#
+# Coloured line functions
+
+function redline {
+    if [[ -t 1 ]]
+    then
+        printf "\e[0;1;37;41m%s\e[0K\e[0m\n" "$*"
+    else
+        echo "***** $* *****"
+    fi
+}
+
+function yellowline {
+    if [[ -t 1 ]]
+    then
+        printf "\e[0;30;43m%s\e[K\e[0m\n" "$*"
+    else
+        echo "===== $* ====="
+    fi
+}
+
+function blueline {
+    if [[ -t 1 ]]
+    then
+        printf "\e[0;1;37;44m%s\e[0K\e[0m\n" "$*"
+    else
+        echo "===== $* ====="
+    fi
+}
+
+function greenline {
+    if [[ -t 1 ]]
+    then
+        printf "\e[0;1;37;42m%s\e[0K\e[0m\n" "$*"
+    else
+        echo "----- $* -----"
+    fi
+}
+
+function cyanline {
+    if [[ -t 1 ]]
+    then
+        printf "\e[0;1;37;46m%s\e[0K\e[0m\n" "$*"
+    else
+        echo "===== $* ====="
+    fi
+}
+
+function purpleline {
+    if [[ -t 1 ]]
+    then
+        printf "\e[0;1;37;45m%s\e[0K\e[0m\n" "$*"
+    else
+        echo "===== $* ====="
+    fi
+}
+
+function whiteline {
+    if [[ -t 1 ]]
+    then
+        printf "\e[0;1;37;47m%s\e[0K\e[0m\n" "$*"
+    else
+        echo "===== $* ====="
+    fi
+}
+
+function fail {
+    redline "$@"
+    exit 1
+}
+
+###############################################################################
+#
+# Maybe print a command before executing it
+
+SET_X="${SET_X:-false}"
+
+function set_x {
+    local IFS=' '
+    if [[ "${SET_X:-false}" == "true" ]]
+    then
+        echo "$PS4$*" 1>&2
+    fi
+    "$@"
+}
+
+########################################
+# Show the same output that set_x would show,
+# but don't actually run the command
+
+function show_x {
+    local IFS=' '
+    if [[ "${SET_X:-false}" == "true" ]]
+    then
+        echo "$PS4$*" 1>&2
+    fi
+}
+
+###############################################################################
+#
+# Usage
+
+function usage {
+    local MSG="${*:-}"
+
+    cat <<EOF
+$0 [OPTIONS] [ARGS]
+
+Detailed description of what the script does.
+
+-n ___  Specify NVAR
+
+-s ___  Specify SVAR
+
+-x      Show the important commands before executing them.
+
+-h      Show this help message.
+
+EOF
+
+    if [[ -n "$MSG" ]]
+    then
+        fail "$MSG"
+    fi
+
+    exit 0
+}
+
+###############################################################################
+###############################################################################
+###############################################################################
+#
+# Process the command line
+
+NVAR=5
+SVAR="string"
+
+while getopts ':hn:s:x' OPT
+do
+    case $OPT in
+        h)  usage
+            ;;
+        n)  NVAR="$OPTARG"
+            ;;
+        s)  SVAR="$OPTARG"
+            ;;
+        x)  SET_X=true
+            ;;
+        *)  usage "ERROR: unknown option '-${OPTARG}'"
+            ;;
+    esac
+done
+
+shift $(( OPTIND - 1 ))
+
+ARG1="${1:-}"
+ARG2="${2:-}"
+
+if [[ -z "$ARG1" ]]
+then
+    usage
+fi
+
+if [[ -z "$ARG2" ]]
+then
+    usage "ERROR: missing ARG2"
+fi
+
+###############################################################################
+#
+# Do the things

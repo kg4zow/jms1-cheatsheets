@@ -1,0 +1,16 @@
+# THIS OVERRIDES THE `cheat` CHEATSHEET FROM THE COMMUNITY REPO
+# https://github.com/cheat/cheatsheets
+#
+# config file: $HOME/.config/cheat/conf.yml
+
+# List available cheatsheets
+cheat -l
+
+# List cheatsheet directories
+cheat -d
+
+# Search available cheatsheets
+cheat -s <command>
+
+# Edit a cheatsheet
+cheat -e <command>
