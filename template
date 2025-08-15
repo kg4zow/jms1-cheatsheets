@@ -5,6 +5,33 @@
 # Last updated 2021-12-12
 #
 # Quick description of what the script does.
+#
+###############################################################################
+#
+# MIT License
+#
+# Copyright (C) 2025 John Simpson
+#
+# Permission is hereby granted, free of charge, to any person obtaining a
+# copy of this software and associated documentation files (the “Software”),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+# DEALINGS IN THE SOFTWARE.
+#
+###############################################################################
+
 
 ########################################
 # Global variables
@@ -113,6 +140,19 @@ function show_x {
 
 ###############################################################################
 #
+# Debugging messages
+
+DO_DEBUG="${DO_DEBUG:-false}"
+
+function debug {
+    if [[ "${DO_DEBUG:-false}" == "true" ]]
+    then
+        yellowline "$*"
+    fi
+}
+
+###############################################################################
+#
 # Usage
 
 function usage {
@@ -128,6 +168,8 @@ Detailed description of what the script does.
 -s ___  Specify SVAR
 
 -x      Show the important commands before executing them.
+
+-D      Show debugging messages.
 
 -h      Show this help message.
 
@@ -150,7 +192,7 @@ EOF
 NVAR=5
 SVAR="string"
 
-while getopts ':hn:s:x' OPT
+while getopts ':hn:s:xD' OPT
 do
     case $OPT in
         h)  usage
@@ -160,6 +202,8 @@ do
         s)  SVAR="$OPTARG"
             ;;
         x)  SET_X=true
+            ;;
+        D)  DO_DEBUG=true
             ;;
         *)  usage "ERROR: unknown option '-${OPTARG}'"
             ;;
