@@ -184,3 +184,7 @@ fi
 ###############################################################################
 #
 # Do the things
+
+echo "CONFIG_FILE='${CONFIG_FILE}'"
+echo "NVAR='${NVAR}'"
+echo "SVAR='${SVAR}'"
