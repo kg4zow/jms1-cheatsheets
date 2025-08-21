@@ -2,13 +2,21 @@
 #
 # script-name
 # Author <email@example.com> 2020-02-02
-# Last updated 2021-12-12
+# Last updated 2025-08-21
 #
 # Quick description of what the script does.
 #
 ###############################################################################
 #
-# MIT License
+# This script: (license)
+#
+# Copyright (C) 2025 whoever
+#
+# Details about this script's licensing
+#
+###############################################################################
+#
+# Original script template: MIT License
 #
 # Copyright (C) 2025 John Simpson
 #
@@ -32,12 +40,16 @@
 #
 ###############################################################################
 
+set -e
+
+PATH="/usr/bin:/bin"
 
 ########################################
 # Global variables
 
-CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/scriptname"
-CONFIG_FILE="${CONFIG_DIR}/filename"
+MYNAME="$( basename -- "$0" )"
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/${MYNAME}"
+CONFIG_FILE="${CONFIG_DIR}/${MYNAME}.conf"
 
 ###############################################################################
 #
