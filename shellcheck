@@ -1,0 +1,3 @@
+# Disable a specific check for the following line
+  # shellcheck disable=SC9999
+  # shellcheck disable=SC9999 # explain why
