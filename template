@@ -2,7 +2,7 @@
 #
 # script-name
 # Author <email@example.com> 2020-02-02
-# Last updated 2025-08-21
+# Last updated 2025-09-09
 #
 # Quick description of what the script does.
 #
@@ -133,7 +133,7 @@ function set_x {
     local IFS=' '
     if [[ "${SET_X:-false}" == "true" ]]
     then
-        echo "$PS4$*" 1>&2
+        cyanline "$PS4$*" 1>&2
     fi
     "$@"
 }
@@ -146,7 +146,7 @@ function show_x {
     local IFS=' '
     if [[ "${SET_X:-false}" == "true" ]]
     then
-        echo "$PS4$*" 1>&2
+        cyanline "$PS4$*" 1>&2
     fi
 }
 
