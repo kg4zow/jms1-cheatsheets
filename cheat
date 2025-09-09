@@ -2,6 +2,17 @@
 # https://github.com/cheat/cheatsheets
 #
 # config file: $HOME/.config/cheat/conf.yml
+# cheatsheet directories:
+#   cheatpaths:
+#     - name     : community
+#       path     : /Users/jms1/git/cheatsheets
+#       tags     : [ community ]
+#       readonly : true
+#
+#     - name     : jms1
+#       path     : /Users/jms1/git/jms1-cheatsheets
+#       tags     : [ jms1team ]
+#       readonly : false
 
 # List available cheatsheets
 cheat -l
