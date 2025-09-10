@@ -2,7 +2,7 @@
 #
 # script-name
 # Author <email@example.com> 2020-02-02
-# Last updated 2025-09-09
+# Last updated 2025-09-10
 #
 # Quick description of what the script does.
 #
@@ -47,7 +47,10 @@ PATH="/usr/bin:/bin"
 ########################################
 # Global variables
 
+MYDIR="$( cd -- "$( dirname -- "$0" )" >/dev/null 2>&1 ; pwd -P )"
 MYNAME="$( basename -- "$0" )"
+MYSELF="$MYDIR/$MYNAME"
+
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/${MYNAME}"
 CONFIG_FILE="${CONFIG_DIR}/${MYNAME}.conf"
 
@@ -175,7 +178,7 @@ $0 [OPTIONS] [ARGS]
 
 Detailed description of what the script does.
 
--n ___  Specify NVAR
+-b      Enable BVAR
 
 -s ___  Specify SVAR
 
@@ -184,6 +187,8 @@ Detailed description of what the script does.
 -D      Show debugging messages.
 
 -h      Show this help message.
+
+Note: two arguments are required in order to do anything.
 
 EOF
 
@@ -201,15 +206,15 @@ EOF
 #
 # Process the command line
 
-NVAR=5
-SVAR="string"
+BVAR=false
+SVAR="(default)"
 
-while getopts ':hn:s:xD' OPT
+while getopts ':hbs:xD' OPT
 do
     case $OPT in
         h)  usage
             ;;
-        n)  NVAR="$OPTARG"
+        b)  BVAR=true
             ;;
         s)  SVAR="$OPTARG"
             ;;
@@ -241,6 +246,12 @@ fi
 #
 # Do the things
 
+echo "MYDIR='${MYDIR}'"
+echo "MYNAME='${MYNAME}'"
+echo "MYSELF='${MYSELF}'"
+echo "CONFIG_DIR='${CONFIG_DIR}'"
 echo "CONFIG_FILE='${CONFIG_FILE}'"
-echo "NVAR='${NVAR}'"
+echo "BVAR='${BVAR}'"
 echo "SVAR='${SVAR}'"
+echo "ARG1='${ARG1}'"
+echo "ARG2='${ARG2}'"
