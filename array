@@ -1,4 +1,35 @@
-###############################################################################
+############################################################
+# Create array with WORDS from a command's ouptut
+# - see https://www.shellcheck.net/wiki/SC2207 for details
+
+TEXT="this is a test"
+IFS=" " read -r -a WORDS <<< "$( echo $TEXT )"
+
+$ echo ${WORDS[1]}
+is
+
+############################################################
+# Create array with LINES from a variable containing a multi-line string
+# - see https://www.shellcheck.net/wiki/SC2207 for details
+
+LINES="$( ls -1 )"
+read -a LINES -d '' -r <<< "$LINES" || true
+
+- the `-a` option will unset `LINES` before starting
+- the `|| true` is needed because `read` exists 1 when it doesn't find the
+  delimiter (in this case, the empty string) in the input
+
+############################################################
+# Create array with LINES from a command's output
+# - see https://www.shellcheck.net/wiki/SC2207 for details
+
+LINES=()
+while IFS='' read -r LINE
+do
+    LINES+=( "$LINE" )
+done < <( ls -1 )
+
+############################################################
 # Dump an array's contents
 # call with a list of items, i.e.
 #   debug_array_items "${ARRAY_NAME[@]}"
@@ -21,7 +52,7 @@ function debug_array_items {
     fi
 }
 
-###############################################################################
+############################################################
 # Dump an array by name
 # call with the array's name, i.e.
 #   debug_array_name ARRAY_NAME
