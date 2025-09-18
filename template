@@ -2,7 +2,7 @@
 #
 # script-name
 # Author <email@example.com> 2020-02-02
-# Last updated 2025-09-10
+# Last updated 2025-09-18
 #
 # Quick description of what the script does.
 #
@@ -169,6 +169,7 @@ function debug {
 ###############################################################################
 #
 # Usage
+# - https://docopt.org/ is the "standard" for how to describe options
 
 function usage {
     local MSG="${*:-}"
