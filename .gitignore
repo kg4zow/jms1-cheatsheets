@@ -1,2 +1,8 @@
+# .gitignore file for jms1-cheatsheets repo
+# last updated 2025-10-12
+
 .DS_Store
 ._*
+*.bak
+*.sw[op]
+*~
