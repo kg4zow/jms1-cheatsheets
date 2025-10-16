@@ -8,19 +8,19 @@ SPEC: https://specifications.freedesktop.org/basedir-spec/latest/
     * if `XDG_DATA_DIRS` exists, it will be a list of items separated by `:`, search these directories if file doesn't exist under `$XDG_DATA_HOME`
 
 * `XDG_CONFIG_HOME` user-specific config files
-  * default `$HOME/.config`
-  * if `XDG_CONFIG_DIRS` exists, it will be a list of items separated by `:`, search these directories if file doesn't exist under `$XDG_CONFIG_HOME`
+    * default `$HOME/.config`
+    * if `XDG_CONFIG_DIRS` exists, it will be a list of items separated by `:`, search these directories if file doesn't exist under `$XDG_CONFIG_HOME`
 
-XDG_STATE_HOME      user-specific state data (including logs?)
-  - default $HOME/.local/state
+* `XDG_STATE_HOME` user-specific state data (including logs?)
+    * default `$HOME/.local/state`
 
-XDG_CACHE_HOME      user-specific non-essential (cached) data
-  - default $HOME/.cache
+* `XDG_CACHE_HOME` user-specific non-essential (cached) data
+    * default `$HOME/.cache`
 
-XDG_RUNTIME_DIR     user-specific runtime files (sockets, pipes, etc.)
-  - no default value
-  - must be owned by user, mode 0700
-  - create on login, delete on logout, contents MUST NOT survive logout/reboot
-  - see docs for more info
+* `XDG_RUNTIME_DIR` user-specific runtime files (sockets, pipes, etc.)
+    * no default value
+    * must be owned by user, mode 0700
+    * create on login, delete on logout, contents MUST NOT survive logout/reboot
+    * see docs for more info
 
 $HOME/.local/bin    user-specific binaries, should be included in PATH
