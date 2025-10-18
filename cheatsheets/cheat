@@ -25,3 +25,17 @@ cheat -s <command>
 
 # Edit a cheatsheet
 cheat -e <command>
+
+# My config - $HOME/.config/cheat/conf.yml
+editor: /PATH/TO/bbedit
+
+cheatpaths:
+  - name     : community
+    path     : /Users/jms1/git/cheat/cheatsheets
+    tags     : [ community ]
+    readonly : true
+
+  - name     : jms1
+    path     : /Users/jms1/git/jms1-cheatsheets/cheatsheets
+    tags     : [ jms1 ]
+    readonly : false
