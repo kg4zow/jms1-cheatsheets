@@ -2,7 +2,7 @@
 #
 # script-name
 # Author <email@example.com> 2020-02-02
-# Last updated 2025-10-03
+# Last updated 2025-10-20
 #
 # Quick description of what the script does.
 #
@@ -50,7 +50,7 @@ PATH="/usr/bin:/bin"
 #   MYNAME  'xyzzy'
 #   MYSELF  '/Users/jms1/bin/xyzzy'
 
-MYDIR="$( cd -- "$( dirname -- "$0" )" >/dev/null 2>&1 ; pwd -P )"
+MYDIR="$( cd -- "$( dirname -- "$0" )" >/dev/null 2>&1 || exit 1 ; pwd -P )"
 MYNAME="$( basename -- "$0" )"
 MYSELF="$MYDIR/$MYNAME"
 
@@ -64,6 +64,12 @@ DATA_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/${MYNAME}"
 STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/${MYNAME}"
 
 CONFIG_FILE="${CONFIG_DIR}/${MYNAME}.conf"
+
+# dummy entries to make shellcheck not complain about un-used variables
+echo "CACHE_DIR='$CACHE_DIR'" > /dev/null
+echo "CONFIG_DIR='$CONFIG_DIR'" > /dev/null
+echo "DATA_DIR='$DATA_DIR'" > /dev/null
+echo "STATE_DIR='$STATE_DIR'" > /dev/null
 
 ###############################################################################
 #
