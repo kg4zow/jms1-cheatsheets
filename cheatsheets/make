@@ -1,0 +1,17 @@
+# Automatic variables in `Makefile`
+# https://www.gnu.org/software/make/manual/html_node/Using-Variables.html
+
+- $@ = target filename
+- $< = name of first pre-requisite
+- $^ = names of all pre-requisites, space separated
+- $? = names of all pre-requisites newer than target, space separated
+
+# Filename-splitting functions
+
+- $(@D) = directory portion of $@   `/path/to/foo` => `/path/to`
+- $(@F) = filename portion of $@    `/path/to/foo` => `foo`
+- same pattern for $<, $^, $?, etc.
+
+# Other
+
+- Variable names are case-sensitive
