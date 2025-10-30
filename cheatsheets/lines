@@ -1,66 +1,45 @@
 # Shell functions to emit coloured lines
 
+function coloured_line {
+    local COL MSG IFS LINE LINES
+
+    COL="$1"
+    shift
+    MSG="$*"
+
+    IFS=$'\n' read -a LINES -d '' -r <<< "$*" || true
+    for LINE in "${LINES[@]}"
+    do
+        printf "\e[%sm%s\e[0K\e[0m\n" "$COL" "$LINE"
+    done
+}
+
 function redline {
-    if [[ -t 1 ]]
-    then
-        printf "\e[0;1;37;41m%s\e[0K\e[0m\n" "$*"
-    else
-        echo "***** $* *****"
-    fi
+    coloured_line '0;1;37;41' "$@"
 }
 
 function yellowline {
-    if [[ -t 1 ]]
-    then
-        printf "\e[0;30;43m%s\e[K\e[0m\n" "$*"
-    else
-        echo "===== $* ====="
-    fi
+    coloured_line '0;30;43' "$@"
 }
 
 function blueline {
-    if [[ -t 1 ]]
-    then
-        printf "\e[0;1;37;44m%s\e[0K\e[0m\n" "$*"
-    else
-        echo "===== $* ====="
-    fi
+    coloured_line '0;1;37;44' "$@"
 }
 
 function greenline {
-    if [[ -t 1 ]]
-    then
-        printf "\e[0;1;37;42m%s\e[0K\e[0m\n" "$*"
-    else
-        echo "----- $* -----"
-    fi
+    coloured_line '0;1;37;42' "$@"
 }
 
 function cyanline {
-    if [[ -t 1 ]]
-    then
-        printf "\e[0;1;37;46m%s\e[0K\e[0m\n" "$*"
-    else
-        echo "===== $* ====="
-    fi
+    coloured_line '0;1;37;46' "$@"
 }
 
 function purpleline {
-    if [[ -t 1 ]]
-    then
-        printf "\e[0;1;37;45m%s\e[0K\e[0m\n" "$*"
-    else
-        echo "===== $* ====="
-    fi
+    coloured_line '0;1;37;45' "$@"
 }
 
 function whiteline {
-    if [[ -t 1 ]]
-    then
-        printf "\e[0;1;37;47m%s\e[0K\e[0m\n" "$*"
-    else
-        echo "===== $* ====="
-    fi
+    coloured_line '0;1;37;47' "$@"
 }
 
 function fail {

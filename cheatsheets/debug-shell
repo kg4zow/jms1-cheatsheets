@@ -1,0 +1,30 @@
+###############################################################################
+#
+# Debugging message
+
+DO_DEBUG="${DO_DEBUG:-false}"
+DEBUG_PREFIX="LOC"
+
+function debug {
+    local IFS LINE LINES PREFIX
+
+    if [[ "${DO_DEBUG:-false}" == "true" ]]
+    then
+        if [[ "$DEBUG_PREFIX" == "LOC" ]]
+        then
+            local CALLER C_LINE C_FILE
+            CALLER="$( caller )"
+            C_LINE="${CALLER% *}"
+            C_FILE="${CALLER#* }"
+            PREFIX="$C_FILE:$C_LINE: "
+        else
+            PREFIX="$DEBUG_PREFIX"
+        fi
+
+        IFS=$'\n' read -a LINES -d '' -r <<< "$*" || true
+        for LINE in "${LINES[@]}"
+        do
+            yellowline "$PREFIX$LINE"
+        done
+    fi
+}

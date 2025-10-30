@@ -2,7 +2,7 @@
 #
 # script-name
 # Author <email@example.com> 2020-02-02
-# Last updated 2025-10-20
+# Last updated 2025-10-29
 #
 # Quick description of what the script does.
 #
@@ -75,67 +75,46 @@ echo "STATE_DIR='$STATE_DIR'" > /dev/null
 #
 # Coloured line functions
 
+function coloured_line {
+    local COL MSG IFS LINE LINES
+
+    COL="$1"
+    shift
+    MSG="$*"
+
+    IFS=$'\n' read -a LINES -d '' -r <<< "$*" || true
+    for LINE in "${LINES[@]}"
+    do
+        printf "\e[%sm%s\e[0K\e[0m\n" "$COL" "$LINE"
+    done
+}
+
 function redline {
-    if [[ -t 1 ]]
-    then
-        printf "\e[0;1;37;41m%s\e[0K\e[0m\n" "$*"
-    else
-        echo "***** $* *****"
-    fi
+    coloured_line '0;1;37;41' "$@"
 }
 
 function yellowline {
-    if [[ -t 1 ]]
-    then
-        printf "\e[0;30;43m%s\e[K\e[0m\n" "$*"
-    else
-        echo "===== $* ====="
-    fi
+    coloured_line '0;30;43' "$@"
 }
 
 function blueline {
-    if [[ -t 1 ]]
-    then
-        printf "\e[0;1;37;44m%s\e[0K\e[0m\n" "$*"
-    else
-        echo "===== $* ====="
-    fi
+    coloured_line '0;1;37;44' "$@"
 }
 
 function greenline {
-    if [[ -t 1 ]]
-    then
-        printf "\e[0;1;37;42m%s\e[0K\e[0m\n" "$*"
-    else
-        echo "----- $* -----"
-    fi
+    coloured_line '0;1;37;42' "$@"
 }
 
 function cyanline {
-    if [[ -t 1 ]]
-    then
-        printf "\e[0;1;37;46m%s\e[0K\e[0m\n" "$*"
-    else
-        echo "===== $* ====="
-    fi
+    coloured_line '0;1;37;46' "$@"
 }
 
 function purpleline {
-    if [[ -t 1 ]]
-    then
-        printf "\e[0;1;37;45m%s\e[0K\e[0m\n" "$*"
-    else
-        echo "===== $* ====="
-    fi
+    coloured_line '0;1;37;45' "$@"
 }
 
 function whiteline {
-    if [[ -t 1 ]]
-    then
-        printf "\e[0;1;37;47m%s\e[0K\e[0m\n" "$*"
-    else
-        echo "===== $* ====="
-    fi
+    coloured_line '0;1;37;47' "$@"
 }
 
 function fail {
@@ -172,14 +151,32 @@ function show_x {
 
 ###############################################################################
 #
-# Debugging messages
+# Debugging message
 
 DO_DEBUG="${DO_DEBUG:-false}"
+DEBUG_PREFIX="LOC"
 
 function debug {
+    local IFS LINE LINES PREFIX
+
     if [[ "${DO_DEBUG:-false}" == "true" ]]
     then
-        yellowline "$*"
+        if [[ "$DEBUG_PREFIX" == "LOC" ]]
+        then
+            local CALLER C_LINE C_FILE
+            CALLER="$( caller )"
+            C_LINE="${CALLER% *}"
+            C_FILE="${CALLER#* }"
+            PREFIX="$C_FILE:$C_LINE: "
+        else
+            PREFIX="$DEBUG_PREFIX"
+        fi
+
+        IFS=$'\n' read -a LINES -d '' -r <<< "$*" || true
+        for LINE in "${LINES[@]}"
+        do
+            yellowline "$PREFIX$LINE"
+        done
     fi
 }
 
@@ -207,6 +204,8 @@ Detailed description of what the script does.
 -h      Show this help message.
 
 Note: two arguments are required in order to do anything.
+
+Last updated 2025-10-29
 
 EOF
 
