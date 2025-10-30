@@ -12,21 +12,16 @@ is
 # Create array with LINES from a variable containing a multi-line string
 # - see https://www.shellcheck.net/wiki/SC2207 for details
 
-function debug {
-    local IFS LINE LINES
-    if [[ "${DO_DEBUG:-false}" == "true" ]]
-    then
-        IFS=$'\n' read -a LINES -d '' -r <<< "$*" || true
-        for LINE in "${LINES[@]}"
-        do
-            yellowline "$LINE"
-        done
-    fi
-}
+IFS=$'\n' read -a LINES -d '' -r <<< "$*" || true
+for LINE in "${LINES[@]}"
+do
+    yellowline "$LINE"
+done
 
 - the `-a` option will unset `LINES` and make it an array before starting
 - the `|| true` is needed because `read` exists 1 when it doesn't find the
   delimiter (in this case, the empty string) in the input
+- see `cheat debug-shell` for full debug() function
 
 ############################################################
 # Create array with LINES from a command's output
