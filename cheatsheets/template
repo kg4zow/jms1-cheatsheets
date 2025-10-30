@@ -2,21 +2,16 @@
 #
 # script-name
 # Author <email@example.com> 2020-02-02
-# Last updated 2025-10-29
+# Last updated 2025-10-30
 #
 # Quick description of what the script does.
 #
 ###############################################################################
 #
-# This script: (license)
+# Portions of the script are from a template created by John Simpson, who has
+# released them under the MIT License.
 #
-# Copyright (C) 2025 whoever
-#
-# Details about this script's licensing
-#
-###############################################################################
-#
-# Original script template: MIT License
+# MIT License
 #
 # Copyright (C) 2025 John Simpson
 #
@@ -37,6 +32,16 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
+#
+###############################################################################
+#
+# The remaining contents of the script are covered under this license:
+#
+# (License Name)
+#
+# Copyright (C) 2025 whoever
+#
+# Details about this script's licensing
 #
 ###############################################################################
 
@@ -199,13 +204,13 @@ Detailed description of what the script does.
 
 -x      Show the important commands before executing them.
 
--D      Show debugging messages.
+-D      Show debugging messages. Also enables '-x'.
 
 -h      Show this help message.
 
 Note: two arguments are required in order to do anything.
 
-Last updated 2025-10-29
+Last updated 2025-10-30
 
 EOF
 
@@ -257,6 +262,11 @@ fi
 if [[ -z "$ARG2" ]]
 then
     usage "ERROR: missing ARG2"
+fi
+
+if $DO_DEBUG
+then
+    SET_X=true
 fi
 
 ###############################################################################
