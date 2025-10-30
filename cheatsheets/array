@@ -39,6 +39,23 @@ do
 done < <( ls -1 )
 
 ############################################################
+# Read LINES from a file into an array
+# - ignore comments and empty lines
+
+SERVERS=()
+while IFS='' read -r LINE
+do
+    LINE="${LINE%%#*}"                          # remove comments
+    LINE="${LINE%"${LINE##*[![:space:]]}"}"     # rtrim spaces
+    LINE="${LINE#"${LINE%%[![:space:]]*}"}"     # ltrim spaces
+
+    if [[ -n "$LINE" ]]
+    then
+        SERVERS+=( "$LINE" )
+    fi
+done < infile
+
+############################################################
 # Dump an array's contents
 # call with a list of items, i.e.
 #   debug_array_items "${ARRAY_NAME[@]}"

@@ -1,0 +1,24 @@
+# Trim spaces from a variable using only bash built-in
+# https://stackoverflow.com/a/3352015/7162750
+
+# trim spaces from beginning, aka "ltrim"
+LINE="${LINE#"${LINE%%[![:space:]]*}"}"
+
+# trim spaces from end, aka "rtrim"
+LINE="${LINE%"${LINE##*[![:space:]]}"}"
+
+############################################################
+# Read 'push-targets' file, ignore comments and empty lines
+
+SERVERS=()
+while IFS='' read -r LINE
+do
+    LINE="${LINE%%#*}"                          # remove comments
+    LINE="${LINE%"${LINE##*[![:space:]]}"}"     # rtrim spaces
+    LINE="${LINE#"${LINE%%[![:space:]]*}"}"     # ltrim spaces
+
+    if [[ -n "$LINE" ]]
+    then
+        SERVERS+=( "$LINE" )
+    fi
+done < push-targets
