@@ -1,0 +1,75 @@
+# .editorconfig - https://editorconfig.org/
+# jms1 2022-?
+# Last updated 2025-09-12
+
+########################################
+# "x-" settings are specific to BBEdit, other editors may not recognize them
+# http://www.barebones.com/support/technotes/editorconfig.html
+
+###############################################################################
+# Global - when searching "upwards" for .editorconfig files, stop here.
+
+root                        = true
+
+###############################################################################
+#
+# Default settings for all files.
+#
+# These settings will be overridden by any settings contained below, or in
+# '.editorconfig' files in directories "below" this one (but "between" this
+# one and the file being edited).
+
+[*]
+charset                     = utf-8
+end_of_line                 = lf
+insert_final_newline        = true
+trim_trailing_whitespace    = true
+indent_style                = space
+indent_size                 = 4
+x-typographers-quotes       = false
+x-soft-wrap-text            = false
+x-show-invisibles           = true
+x-show-spaces               = false
+
+########################################
+# Markdown
+
+[*.{md,markdown}]
+x-soft-wrap-text            = true
+x-soft-wrap-mode            = WindowWidth
+
+########################################
+# Puppet/Ruby code
+
+[*.{pp,rb}]
+indent_style                = space
+indent_size                 = 2
+
+########################################
+# YAML
+
+[*.{yaml,yml}]
+indent_style                = space
+indent_size                 = 2
+
+########################################
+# Erlang terms files
+
+[*.{config,config.erb}]
+indent_style                = space
+indent_size                 = 2
+
+########################################
+# Makefile - lines containing build steps must be indented *using TABs*.
+
+[Makefile]
+indent_style                = tab
+indent_size                 = 8
+
+########################################
+# crontab files - must use TAB between time, user, and command
+# - this may need other filename patterns
+
+[crontab.*]
+indent_style                = tab
+indent_size                 = 8
