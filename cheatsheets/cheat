@@ -26,6 +26,9 @@ cheat -s <command>
 # Edit a cheatsheet
 cheat -e <command>
 
+# Copy a cheatsheet so it can be pasted (macOS)
+cheat x | pbcopy
+
 # My config - $HOME/.config/cheat/conf.yml
 editor: /PATH/TO/bbedit
 
