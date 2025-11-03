@@ -2,7 +2,7 @@
 #
 # script-name
 # Author <email@example.com> 2020-02-02
-# Last updated 2025-10-30
+# Last updated 2025-11-03
 #
 # Quick description of what the script does.
 #
@@ -210,7 +210,7 @@ Detailed description of what the script does.
 
 Note: two arguments are required in order to do anything.
 
-Last updated 2025-10-30
+Last updated 2025-11-03
 
 EOF
 
@@ -243,6 +243,7 @@ do
         x)  SET_X=true
             ;;
         D)  DO_DEBUG=true
+            SET_X=true
             ;;
         *)  usage "ERROR: unknown option '-${OPTARG}'"
             ;;
@@ -262,11 +263,6 @@ fi
 if [[ -z "$ARG2" ]]
 then
     usage "ERROR: missing ARG2"
-fi
-
-if $DO_DEBUG
-then
-    SET_X=true
 fi
 
 ###############################################################################
