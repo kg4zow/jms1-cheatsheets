@@ -1,0 +1,26 @@
+---
+syntax  : perl
+---
+# Run an external command
+# - returns exit code *and* whatever the command sends to STDOUT
+
+sub runit(@)
+{
+    my $cmd = join( ' ' , @_ ) ;
+
+    $set_x && logit "+ $cmd" ;
+
+    open ( my $fh , '-|' , $cmd )
+        or die "ERROR: can't run \"$cmd\": $!\n" ;
+
+    my $out = '' ;
+    while ( my $line = <$fh> )
+    {
+        $out .= $line ;
+    }
+
+    close( $fh ) ;
+    my $rv = $? ;
+
+    return ( $rv , $out ) ;
+}

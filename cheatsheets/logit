@@ -1,3 +1,6 @@
+---
+syntax  : perl
+---
 # Simple logging function
 # - sends output to $LOG_FILE if defined, or STDOUT if not
 # - adds timestamps before each line in the message

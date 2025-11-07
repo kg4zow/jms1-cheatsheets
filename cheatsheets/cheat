@@ -29,6 +29,11 @@ cheat -e <command>
 # Copy a cheatsheet so it can be pasted (macOS)
 cheat x | pbcopy
 
+# Syntax highlighting
+- YAML front-matter ... `syntax : perl`
+- https://github.com/alecthomas/chroma/ ... repo README has language list
+- useful: bash c perl
+
 # My config - $HOME/.config/cheat/conf.yml
 editor: /PATH/TO/bbedit
 
