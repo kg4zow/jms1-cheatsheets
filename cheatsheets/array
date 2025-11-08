@@ -1,3 +1,6 @@
+---
+syntax  : bash
+---
 ############################################################
 # Create array with WORDS from a command's ouptut
 # - see https://www.shellcheck.net/wiki/SC2207 for details

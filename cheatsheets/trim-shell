@@ -1,3 +1,6 @@
+---
+syntax  : bash
+---
 # Trim spaces from a variable using only bash built-in
 # https://stackoverflow.com/a/3352015/7162750
 

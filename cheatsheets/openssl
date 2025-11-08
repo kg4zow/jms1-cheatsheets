@@ -1,6 +1,5 @@
 ---
 syntax  : bash
-tags    : [ shell ]
 ---
 # Show full contents of an SSL certificate
 # - works with both PEM and DER encoded certificates

@@ -1,3 +1,6 @@
+---
+syntax  : bash
+---
 # Print $1 copies of $2
 # https://stackoverflow.com/questions/5349718/how-can-i-repeat-a-character-in-bash#comment30547785_5349842
 # - the `eval` is necessary because the shell doesn't parse variables when

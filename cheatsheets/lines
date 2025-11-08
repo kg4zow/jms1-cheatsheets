@@ -1,3 +1,6 @@
+---
+syntax  : bash
+---
 # Shell functions to emit coloured lines
 
 function coloured_line {
