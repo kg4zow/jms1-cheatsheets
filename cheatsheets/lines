@@ -10,7 +10,7 @@ function coloured_line {
     shift
     MSG="$*"
 
-    IFS=$'\n' read -a LINES -d '' -r <<< "$*" || true
+    IFS=$'\n' read -a LINES -d '' -r <<< "$MSG" || true
     for LINE in "${LINES[@]}"
     do
         printf "\e[%sm%s\e[0K\e[0m\n" "$COL" "$LINE"

@@ -2,7 +2,7 @@
 #
 # script-name
 # Author <email@example.com> 2020-02-02
-# Last updated 2025-11-03
+# Last updated 2025-11-13
 #
 # Quick description of what the script does.
 #
@@ -87,7 +87,7 @@ function coloured_line {
     shift
     MSG="$*"
 
-    IFS=$'\n' read -a LINES -d '' -r <<< "$*" || true
+    IFS=$'\n' read -a LINES -d '' -r <<< "$MSG" || true
     for LINE in "${LINES[@]}"
     do
         printf "\e[%sm%s\e[0K\e[0m\n" "$COL" "$LINE"
@@ -210,7 +210,7 @@ Detailed description of what the script does.
 
 Note: two arguments are required in order to do anything.
 
-Last updated 2025-11-03
+Last updated 2025-11-13
 
 EOF
 
