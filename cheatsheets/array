@@ -54,6 +54,11 @@ do
 done < infile
 
 ############################################################
+# Copy an array
+
+FILES=( "$@" )
+
+############################################################
 # Dump an array's contents
 # call with a list of items, i.e.
 #   debug_array_items "${ARRAY_NAME[@]}"
