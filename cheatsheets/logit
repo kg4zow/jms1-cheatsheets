@@ -1,6 +1,7 @@
 ---
 syntax  : bash
 ---
+###############################################################################
 # Simple logging function
 # - sends output to $LOG_FILE if defined, or STDOUT if not
 # - adds timestamps before each line in the message
@@ -18,3 +19,48 @@ function logit {
         echo "$MSG" | sed "s/^/${NOW} /"
     fi
 }
+
+###############################################################################
+# Better logging function
+# * If parameters are specified, each parameter is a message to be "logged"
+#   * logit "this is a test" "and another test" and another
+# * Otherwise, use STDIN as the message
+#   * echo 'this is a test' | logit
+#   * logit <<EOF
+#     blah
+#     EOF
+
+function logit {
+    local IFS LINE LINES P
+
+    if [[ -n "$1" ]]
+    then
+        ########################################
+        # prefix lines from parameters
+
+        for P in "$@"
+        do
+            IFS=$'\n' read -a LINES -d '' -r <<< "$P" || true
+            for LINE in "${LINES[@]}"
+            do
+                echo "$( date -u +%Y-%m-%dT%H:%M:%S.%N%z ) $LINE"
+            done
+        done
+    else
+        ########################################
+        # prefix lines from STDIN
+
+        while IFS='' read -r LINE
+        do
+            echo "$( date -u +%Y-%m-%dT%H:%M:%S.%N%z ) $LINE"
+        done
+    fi
+}
+
+###############################################################################
+#
+# Send all script output through 'logit' function
+exec > >( logit ) 2>&1
+
+# while also sending to a log file
+exec > >( logit | tee -a logfile ) 2>&1
