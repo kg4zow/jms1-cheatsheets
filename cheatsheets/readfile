@@ -1,0 +1,5 @@
+---
+syntax  : bash
+---
+# Read a file into a variable without spawning any new processes
+VAR="$( < filename )"
