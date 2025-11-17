@@ -1,0 +1,71 @@
+# ANSI X3.41 or ISO/IEC 2022 or ECMA-35 or JIS X 0202 escape sequences
+# https://vt100.net/  - manuals etc. from VT-series terminals
+#   https://vt100.net/docs/vt100-ug/ = VT100 user guide
+#   https://vt100.net/docs/vt220-rm/ = VT220 programmer reference manual
+#   https://vt100.net/dec/ek-vt240-hr-002.pdf = VT240 guide PDF
+# https://en.wikipedia.org/wiki/ANSI_escape_code
+# https://en.wikipedia.org/wiki/ISO/IEC_2022
+# https://iterm2.com/documentation-escape-codes.html = iTerm2 specific
+# https://invisible-island.net/xterm/ctlseqs/ctlseqs.html = xterm
+# https://www2.ccs.neu.edu/research/gpc/VonaUtils/vona/terminal/vtansi.htm
+# https://ansi.tools/ - javascript preview
+
+CSI = 0x1B 0x5B ("ESC [") or 0x9B = control sequence introducer
+DCS = 0x1B 0x50 ("ESC P") or 0x90 = device control string
+OSC = 0x1B 0x5D ("ESC ]") or 0x9D = operating system command (linux console)
+ST  = 0x1B 0x5C ("ESC \") or 0x9C = string terminator
+
+CSI ... A   CUU   move (x) lines up
+CSI ... B   CUD   move (x) lines down
+CSI ... C   CUF   move (x) chars right
+CSI ... D   CUB   move (x) chars left
+CSI ... E   CNL   move (x) lines down and column 1
+CSI ... F   CPL   move (x) lines up and column 1
+CSI ... G   CHA   move to column (x) on current line
+CSI ... H   CUP   move cursor to (line;column) (top left is 1;1 or 0;0)
+CSI ... J   ED    erase display 0=to end, 1=to begin, 2=all, 3=saved lines
+CSI ... K   EL    erase line    0=to end, 1=to begin, 2=all
+CSI ... S   SU    scroll text up (x) lines
+CSI ... T   SD    scroll text down (x) lines
+CSI ... @   ICH   insert (x) spaces, move existing text right
+CSI ... P   DCH   delete (x) chars, move existing text after to left
+CSI ... X   ECH   erase (x) chars (overwrite with spaces)
+CSI ... L   IL    insert (x) lines
+CSI ... M   DL    delete (x) lines
+CSI ... r         set scrolling region to lines {start};{end}, empty resets
+
+CSI ... m   SGR   set graphics rendition
+  0=reset       1=bold        2=faint    3=italic   4=underlined
+  5=blink slow  6=blink fast  7=reverse  8=conceal  9=crossed out
+  30-37       FG colour (see below)
+  38          FG colour ext: 38;5;# = 256 colour, 38;2;R;G;B = 24-bit colour
+  39          FG colour default
+  40-47       BG colour (see below)
+  48          BG colour ext: 48;5;# = 256 colour, 48;2;R;G;B = 24-bit colour
+  49          BG colour default
+  90-97       FG bright (see below)
+  100-107     BG bright (see below)
+    (x0=black x1=red x2=green x3=yellow x4=blue x5=purple x6=cyan x7=white)
+
+CSI key;"string"p   map key
+
+CSI s       SCP     save cursor position      DEC: ESC 7
+CSI u       RCP     restore cursor position   DEC: ESC 8
+CSI c               query device code - returns CSI ?64;...c (???)
+CSI i               print screen to AUX port
+CSI 1 i             print current line to AUX port
+CSI 4 i             stop sending text to AUX port
+CSI 5 i             start sending text to AUX port
+CSI 6 n             request cursor position, reports "CSI line;col R"
+
+ESC # 3     DECDHL  set line double high/wide, top half
+ESC # 4     DECDHL  set line double high/wide, bottom half
+ESC # 5     DECSWL  set line normal
+ESC # 6     DECDWL  set line double wide
+ESC c       RIS     reset to initial state
+ESC D               scroll down one line
+ESC M               scroll up one line
+
+CSI ? 25 {h,l}    show (h) or hide (l) cursor (VT220)
+
+OSC 9 ; message ST    (iTerm2) post notification

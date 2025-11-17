@@ -1,20 +1,44 @@
 ---
 syntax  : bash
 ---
+###############################################################################
+#
 # Shell functions to emit coloured lines
 
+############################################################
+# Slice and dice a message into lines, print each line in the selected colour
+# - first parameter is colour, will be inserted into "ESC [ ... m" sequence
+# - if more parmeters are present, each is a line (or multi-line)
+# - if no more parameters are present, STDIN will be split into lines
+
 function coloured_line {
-    local COL MSG IFS LINE LINES
+    local COL P IFS LINE LINES
 
-    COL="$1"
+    COL="${1:?no colour code specified}"
     shift
-    MSG="$*"
 
-    IFS=$'\n' read -a LINES -d '' -r <<< "$MSG" || true
-    for LINE in "${LINES[@]}"
-    do
-        printf "\e[%sm%s\e[0K\e[0m\n" "$COL" "$LINE"
-    done
+    if [[ -n "$1" ]]
+    then
+        ########################################
+        # each parameter is a line
+
+        for P in "$@"
+        do
+            IFS=$'\n' read -a LINES -d '' -r <<< "$P" || true
+            for LINE in "${LINES[@]}"
+            do
+                printf "\e[%sm%s\e[0K\e[0m\n" "$COL" "$LINE"
+            done
+        done
+    else
+        ########################################
+        # STDIN will contain one or more lines of text
+
+        while IFS='' read -r LINE
+        do
+            printf "\e[%sm%s\e[0K\e[0m\n" "$COL" "$LINE"
+        done
+    fi
 }
 
 function redline {
