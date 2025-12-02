@@ -2,7 +2,7 @@
 #
 # script-name
 # Author <email@example.com> 2020-02-02
-# Last updated 2025-11-16
+LAST_UPDATED="2025-12-02"
 #
 # Quick description of what the script does.
 #
@@ -235,7 +235,7 @@ Detailed description of what the script does.
 
 Note: two arguments are required in order to do anything.
 
-Last updated 2025-11-16
+Last updated $LAST_UPDATED
 
 EOF
 
