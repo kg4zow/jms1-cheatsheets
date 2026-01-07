@@ -1,0 +1,49 @@
+############################################################
+# Standard - parsing $ARGV
+
+VAR_A=false
+VAR_B=""
+
+while getopts ':ab:' OPT
+do
+    case $OPT in
+        a)  VAR_A=true
+            ;;
+        b)  VAR_B="OPTARG"
+            ;;
+        *)  echo "ERROR unknown option '-${OPTARG}'
+            exit 1
+            ;;
+    esac
+done
+
+shift $(( OPTIND - 1 ))
+
+############################################################
+# In a function - parsing its arguments
+# - case '\?' matches totally unknown option
+# - case '*'  matches option in `getopts` list without a case block
+# - case blocks are evaluated in the order written, '*' should be last
+
+function doit {
+    local OPT ARG
+
+    while getopts ":a:h" OPT "$@"
+    do
+        case $OPT in
+            a)  echo "case a OPT='$OPT' OPTARG='$OPTARG'" ;;
+            \?) echo "case ? OPT='$OPT' OPTARG='$OPTARG'" ;;
+            *)  echo "case * OPT='$OPT' OPTARG='$OPTARG'" ;;
+        esac
+    done
+
+    echo "OPTIND=${OPTIND}"
+    shift $(( OPTIND - 1 ))
+
+    for ARG in $@
+    do
+        echo "arg '$ARG'"
+    done
+}
+
+doit -a 5 -h -t this is a test
