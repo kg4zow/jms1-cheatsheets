@@ -1,0 +1,27 @@
+# THIS OVERRIDES THE `gpg` CHEATSHEET FROM THE COMMUNITY REPO
+#   https://github.com/cheat/cheatsheets
+# Use `cheat -p community gpg` to see that one
+
+### Extend expiration date of existing key (times are UTC)
+# (I do this once a year)
+
+KEYID="E3F7F5F76640299C5507FBAA49B9FD3BB4422EBB"
+gpg --quick-set-expire $KEYID 20261231T235959
+
+# If not expired yet
+gpg --quick-set-expire $KEYID 20261231T235959 '*'
+
+# If expired, using '*' for "all sub-keys" won't work, must specify subkey
+# IDs individually (one-liner not fully tested yet)
+SUBS=( $( gpg -k --with-colons $KEYID | awk -F: 'c&&!--c{print $10};/^sub/{c=1}' ) )
+for SUB in "${SUBS[@]}" ; do gpg --quick-set-expire $KEYID 20261231T235959 $SUB ; done
+
+### tar/encrypt a directory
+tar cz . | gpg -ear RECIPIENT > /path/to/output.tar.gz.asc
+
+* -e = encrypt
+* -a = ASCII-armour
+* -r xxx = specify recipient (name, email, key id)
+* --comment xxx = add a human-readable comment in ASCII-armoured output
+* --set-filename xxx = set "original filename" flag within encrypted data
+* -o xxx = specify output filename (instead of STDOUT)

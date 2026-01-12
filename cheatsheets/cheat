@@ -1,5 +1,8 @@
 # THIS OVERRIDES THE `cheat` CHEATSHEET FROM THE COMMUNITY REPO
-# https://github.com/cheat/cheatsheets
+#   https://github.com/cheat/cheatsheets
+
+# Show a cheatsheet from a specific set
+cheat -p community cheat
 
 # Show a cheatsheet in a sub-directory
 cheat shell/template
@@ -37,3 +40,8 @@ cheatpaths:
     path     : /Users/jms1/git/jms1-cheatsheets/cheatsheets
     tags     : [ jms1 ]
     readonly : false
+
+  - name     : voalte
+    path     : /keybase/team/voalte.common/cheatsheets
+    tags     : [ voalte ]
+    readonly : true
