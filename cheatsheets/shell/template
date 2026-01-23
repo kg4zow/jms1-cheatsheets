@@ -2,7 +2,7 @@
 #
 # script-name
 # Author <email@example.com> 2020-02-02
-LAST_UPDATED="2025-12-02"
+LAST_UPDATED="2026-01-23"
 #
 # Quick description of what the script does.
 #
@@ -13,7 +13,7 @@ LAST_UPDATED="2025-12-02"
 #
 # MIT License
 #
-# Copyright (C) 2025 John Simpson
+# Copyright (C) 2025-2026 John Simpson
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -39,7 +39,7 @@ LAST_UPDATED="2025-12-02"
 #
 # (License Name)
 #
-# Copyright (C) 2025 whoever
+# Copyright (C) 2026 whoever
 #
 # Details about this script's licensing
 #
@@ -84,6 +84,7 @@ echo "STATE_DIR='$STATE_DIR'" > /dev/null
 # Slice and dice a message into lines, print each line in the selected colour
 # - first parameter is colour, will be inserted into "ESC [ ... m" sequence
 # - if more parmeters are present, each is a line (or multi-line)
+#   - each parameter must be non-empty, use a single space for a 'blank' line
 # - if no more parameters are present, STDIN will be split into lines
 
 function coloured_line {
