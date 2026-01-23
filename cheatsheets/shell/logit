@@ -3,14 +3,15 @@ syntax  : bash
 ---
 ###############################################################################
 # Simple logging function
-# - sends output to $LOG_FILE if defined, or STDOUT if not
-# - adds timestamps before each line in the message
+# - Sends output to $LOG_FILE if defined, or STDOUT if not
+# - Adds ISO-8601 timestamps before each line in the message
+#   - %N is nanoseconds (for the 'date' command)
 
 function logit {
     local MSG NOW
     MSG="${*:-}"
 
-    NOW="$( date '+%Y-%m-%dT%H:%M:%S%z' )"
+    NOW="$( date -u '+%Y-%m-%dT%H:%M:%S.%N%Z' )"
 
     if [[ -n "${LOG_FILE:-}" ]]
     then
@@ -22,11 +23,14 @@ function logit {
 
 ###############################################################################
 # Better logging function
-# * If parameters are specified, each parameter is a message to be "logged"
-#   * logit "this is a test" "and another test" and another
-# * Otherwise, use STDIN as the message
-#   * echo 'this is a test' | logit
-#   * logit <<EOF
+# - Sends output to $LOG_FILE if defined, or STDOUT if not
+# - Adds ISO-8601 timestamps before each line in the message
+#   - %N is nanoseconds (for the 'date' command)
+# - If parameters are specified, each parameter is a message to be "logged"
+#   - logit "this is a test" "and another test" and another
+# - Otherwise, use STDIN as the message
+#   - echo 'this is a test' | logit
+#   - logit <<EOF
 #     blah
 #     EOF
 
@@ -43,7 +47,12 @@ function logit {
             IFS=$'\n' read -a LINES -d '' -r <<< "$P" || true
             for LINE in "${LINES[@]}"
             do
-                echo "$( date -u +%Y-%m-%dT%H:%M:%S.%N%z ) $LINE"
+                if [[ -n "${LOG_FILE:-}" ]]
+                then
+                    echo "$( date -u '+%Y-%m-%dT%H:%M:%S.%N%Z' ) $LINE" >> "$LOG_FILE"
+                else
+                    echo "$( date -u '+%Y-%m-%dT%H:%M:%S.%N%Z' ) $LINE"
+                fi
             done
         done
     else
@@ -52,7 +61,12 @@ function logit {
 
         while IFS='' read -r LINE
         do
-            echo "$( date -u +%Y-%m-%dT%H:%M:%S.%N%z ) $LINE"
+            if [[ -n "${LOG_FILE:-}" ]]
+            then
+                echo "$( date -u +%Y-%m-%dT%H:%M:%S.%N%z ) $LINE" >> "$LOG_FILE"
+            else
+                echo "$( date -u +%Y-%m-%dT%H:%M:%S.%N%z ) $LINE"
+            fi
         done
     fi
 }
