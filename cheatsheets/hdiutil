@@ -1,0 +1,23 @@
+# hdiutil options, use 'hdiutil create -h' for lists of values
+-format     container format (UDZO, ULFO, etc.)
+-layout     partition table format, NONE for none
+-fs         filesystem
+
+# create DMG from directory (ex: iCloud docs)
+hdiutil create \
+    -format     UDZO \
+    -layout     NONE \
+    -fs         'Case-sensitive HFS+' \
+    -volname    'iCloud Backup' \
+    -srcfolder  "$HOME/Library/Mobile Documents" \
+    -verbose    \
+    "$HOME/Desktop/iCloud Backup.dmg"
+
+# back up a directory to ISO
+hdiutil makehybrid -iso -joliet \
+    -o  "$HOME/Desktop/backup.iso" \
+    "/source/dir"
+
+# convert DMG to ISO
+hdiutil convert input.dmg -format UDTO -o output.iso
+mv output.iso.cdr output.iso
