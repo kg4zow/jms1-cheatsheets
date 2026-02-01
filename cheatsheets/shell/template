@@ -2,7 +2,7 @@
 #
 # script-name
 # Author <email@example.com> 2020-02-02
-LAST_UPDATED="2026-01-23"
+LAST_UPDATED="2026-01-31"
 #
 # Quick description of what the script does.
 #
@@ -84,8 +84,10 @@ echo "STATE_DIR='$STATE_DIR'" > /dev/null
 # Slice and dice a message into lines, print each line in the selected colour
 # - first parameter is colour, will be inserted into "ESC [ ... m" sequence
 # - if more parmeters are present, each is a line (or multi-line)
-#   - each parameter must be non-empty, use a single space for a 'blank' line
+#   - parameters which are empty strings will generate blank coloured lines
 # - if no more parameters are present, STDIN will be split into lines
+#   - empty lines in input will become blank coloured lines
+#   - empty STDIN will generate no output
 
 function coloured_line {
     local COL P IFS LINE LINES
@@ -93,18 +95,23 @@ function coloured_line {
     COL="${1:?no colour code specified}"
     shift
 
-    if [[ -n "$1" ]]
+    if (( $# > 0 ))
     then
         ########################################
-        # each parameter is a line
+        # Each parameter may be one or more lines
 
         for P in "$@"
         do
-            IFS=$'\n' read -a LINES -d '' -r <<< "$P" || true
-            for LINE in "${LINES[@]}"
-            do
-                printf "\e[%sm%s\e[0K\e[0m\n" "$COL" "$LINE"
-            done
+            if [[ -n "$P" ]]
+            then
+                IFS=$'\n' read -a LINES -d '' -r <<< "$P" || true
+                for LINE in "${LINES[@]}"
+                do
+                    printf "\e[%sm%s\e[0K\e[0m\n" "$COL" "$LINE"
+                done
+            else
+                printf "\e[%sm%s\e[0K\e[0m\n" "$COL" ''
+            fi
         done
     else
         ########################################
