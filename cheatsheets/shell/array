@@ -24,7 +24,7 @@ done
 - the `-a` option will unset `LINES` and make it an array before starting
 - the `|| true` is needed because `read` exists 1 when it doesn't find the
   delimiter (in this case, the empty string) in the input
-- see `cheat debug-shell` for full debug() function
+- see `cheat shell/debug` for full debug() function
 
 ############################################################
 # Create array with LINES from a command's output

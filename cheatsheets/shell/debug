@@ -27,7 +27,7 @@ function debug {
         IFS=$'\n' read -a LINES -d '' -r <<< "$*" || true
         for LINE in "${LINES[@]}"
         do
-            yellowline "$PREFIX$LINE"
+            yellowline "$PREFIX$LINE" 1>&2
         done
     fi
 }

@@ -2,7 +2,7 @@
 #
 # script-name
 # Author <email@example.com> 2020-02-02
-LAST_UPDATED="2026-01-31"
+LAST_UPDATED="2026-02-02"
 #
 # Quick description of what the script does.
 #
@@ -213,7 +213,7 @@ function debug {
         IFS=$'\n' read -a LINES -d '' -r <<< "$*" || true
         for LINE in "${LINES[@]}"
         do
-            yellowline "$PREFIX$LINE"
+            yellowline "$PREFIX$LINE" 1>&2
         done
     fi
 }
