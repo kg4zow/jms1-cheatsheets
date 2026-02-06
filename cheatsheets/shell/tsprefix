@@ -1,0 +1,65 @@
+###############################################################################
+#
+# Prefix a timestamp before every line of output
+#
+# If the first parameter ...
+# - starts with `+`, it will be used as the format string for the `date`
+#   command which generates each timestamp.
+# - is empty, it will be removed from the parameter list but otherwise
+#   ignored. If it's possible that an input parameter *could* start with
+#   `+` and you want to treat it as a line to be logged without specifying a custom
+#
+# This can be called as ...
+# - tsprefix 'message'
+# - tsprefix 'aaa' 'bbb' '' 'ccc'
+# - command | tsprefix
+
+function tsprefix {
+    local TSFORMAT ARG IFS LINE
+
+    ########################################
+    # If the first argument starts with `+`
+    # - use it as the format option
+    # - shift it off of our argument list
+    # Otherwise
+    # - use the default format "+%FT%T.%NZ"
+    #   - this works with Linux and macOS, although in macOS %N is only
+    #     accurate to microseconds (so it always has `000` at the end)
+
+    if [[ "$1" =~ ^\+ ]]
+    then
+        TSFORMAT="$1"
+        shift
+    else
+        TSFORMAT="+%FT%T.%NZ"
+    fi
+
+    ########################################
+    # If any parameters remain (after maybe shifting off a timestamp format),
+    # process each parameter.
+    # - Each parameter may be a single-line, multi-line, or empty string.
+    # - Split each parameter's value into lines.
+    # - Print each line, prefixed by a timestamp.
+
+    if (( $# > 0 ))
+    then
+        for ARG in "$@"
+        do
+            while IFS='' read -r LINE
+            do
+                printf "%s %s\n" "$( date -u "$TSFORMAT" )" "$LINE"
+            done <<< "$ARG"
+        done
+
+    ########################################
+    # Otherwise (if no more parameters exist), process STDIN.
+    # - Each line will be printed, prefixed by a timestamp.
+    # - Empty lines are printed as empty strings, prefixed by a timestamp.
+
+    else
+        while IFS='' read -r LINE
+        do
+            printf "%s %s\n" "$( date -u "$TSFORMAT" )" "$LINE"
+        done
+    fi
+}

@@ -1,0 +1,63 @@
+###############################################################################
+#
+# Send a copy of all output to a log file
+# - original output goes to STDOUT, un-modified
+# - copy goes to the log file, with timestamps added
+
+function tslogfile {
+    local LOGFILE TSFORMAT ARG IFS LINE
+
+    ########################################
+    # Get the logfile name. If no name is present, die.
+
+    LOGFILE="${1:?tslogfile: no log file specified}"
+    shift
+
+    ########################################
+    # If the next parameter starts with `+`
+    # - use it as the format option for the `date` command which generates
+    #   the timestamps
+    # - shift it off of our argument list
+    # Otherwise
+    # - use the default format "+%FT%T.%NZ"
+    #   - this works with Linux and macOS, although in macOS %N is only
+    #     accurate to microseconds (so it always has `000` at the end)
+
+    if [[ "$1" =~ ^\+ ]]
+    then
+        TSFORMAT="$1"
+        shift
+    else
+        TSFORMAT="+%FT%T.%NZ"
+    fi
+
+    ########################################
+    # If any parameters remain, process each parameter.
+    # - Each parameter may be a single-line, multi-line, or empty string.
+    # - Split each parameter's value into lines.
+    # - Print each line, prefixed by a timestamp.
+
+    if (( $# > 0 ))
+    then
+        for ARG in "$@"
+        do
+            while IFS='' read -r LINE
+            do
+                echo "$LINE"
+                printf "%s %s\n" "$( date -u "$TSFORMAT" )" "$LINE" >> "$LOGFILE"
+            done <<< "$ARG"
+        done
+
+    ########################################
+    # Otherwise (if no more parameters exist), process STDIN.
+    # - Each line will be printed, prefixed by a timestamp.
+    # - Empty lines are printed as empty strings, prefixed by a timestamp.
+
+    else
+        while IFS='' read -r LINE
+        do
+            echo "$LINE"
+            printf "%s %s\n" "$( date -u "$TSFORMAT" )" "$LINE" >> "$LOGFILE"
+        done
+    fi
+}

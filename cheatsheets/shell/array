@@ -26,6 +26,14 @@ done
   delimiter (in this case, the empty string) in the input
 - see `cheat shell/debug` for full debug() function
 
+2026-02-06 the 'read' command above seems to skip over blank lines in the
+string. This is simpler and seems to handle blank lines better:
+
+while IFS='' read -r LINE
+do
+    yellowline "$LINE"
+done <<< "$ARG"
+
 ############################################################
 # Create array with LINES from a command's output
 # - see https://www.shellcheck.net/wiki/SC2207 for details

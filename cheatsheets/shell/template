@@ -2,7 +2,7 @@
 #
 # script-name
 # Author <email@example.com> 2020-02-02
-LAST_UPDATED="2026-02-02"
+LAST_UPDATED="2026-02-06"
 #
 # Quick description of what the script does.
 #
@@ -82,41 +82,53 @@ echo "STATE_DIR='$STATE_DIR'" > /dev/null
 
 ############################################################
 # Slice and dice a message into lines, print each line in the selected colour
-# - first parameter is colour, will be inserted into "ESC [ ... m" sequence
-# - if more parmeters are present, each is a line (or multi-line)
-#   - parameters which are empty strings will generate blank coloured lines
-# - if no more parameters are present, STDIN will be split into lines
+# - First parameter is the "n;n;n" value representing the foreground/background
+#   colour. It will be inserted into an "ESC [ ___ m" sequence.
+# - If more parmeters are present, they will be processsed.
+#   - Each parameter may be a single-line, multi-line, or empty string.
+# - If no more parameters are present, STDIN will be split into lines
 #   - empty lines in input will become blank coloured lines
 #   - empty STDIN will generate no output
 
 function coloured_line {
     local COL P IFS LINE LINES
 
+    ########################################
+    # The first parameter (required) is the 'n;n;n' code used in the escape
+    # sequence to set up the foreground and/or background colours.
+    #   ESC [ ___ m
+
     COL="${1:?no colour code specified}"
     shift
 
+    ########################################
+    # If any parameters remain (after shifting off the colour code),
+    # process each parameter.
+    # - Each parameter may be a single-line, multi-line, or empty string.
+    # - Split each parameter's value into lines.
+    # - Print each line, with the appropriate colour codes before/after it.
+
     if (( $# > 0 ))
     then
-        ########################################
-        # Each parameter may be one or more lines
-
         for P in "$@"
         do
             if [[ -n "$P" ]]
             then
-                IFS=$'\n' read -a LINES -d '' -r <<< "$P" || true
-                for LINE in "${LINES[@]}"
+                while IFS='' read -r LINE
                 do
                     printf "\e[%sm%s\e[0K\e[0m\n" "$COL" "$LINE"
-                done
+                done <<< "$P"
             else
                 printf "\e[%sm%s\e[0K\e[0m\n" "$COL" ''
             fi
         done
-    else
-        ########################################
-        # STDIN will contain one or more lines of text
 
+    ########################################
+    # Otherwise (if no more parameters exist), process STDIN.
+    # - Each line will be printed, with the appropriate colour codes.
+    # - Empty lines are printed as empty strings, in the appropriate colour.
+
+    else
         while IFS='' read -r LINE
         do
             printf "\e[%sm%s\e[0K\e[0m\n" "$COL" "$LINE"
