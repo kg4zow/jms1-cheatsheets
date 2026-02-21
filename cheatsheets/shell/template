@@ -2,7 +2,7 @@
 #
 # script-name
 # Author <email@example.com> 2020-02-02
-LAST_UPDATED="2026-02-06"
+readonly LAST_UPDATED="2026-02-21"
 #
 # Quick description of what the script does.
 #
