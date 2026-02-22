@@ -2,7 +2,7 @@
 #
 # script-name
 # Author <email@example.com> 2020-02-02
-readonly LAST_UPDATED="2026-02-21"
+readonly LAST_UPDATED="2026-02-22"
 #
 # Quick description of what the script does.
 #
@@ -51,9 +51,9 @@ PATH="/usr/bin:/bin"
 
 ########################################
 # Global variables
-#   MYDIR   '/Users/jms1/bin'
-#   MYNAME  'xyzzy'
-#   MYSELF  '/Users/jms1/bin/xyzzy'
+#   MYDIR   dir containing script   '/Users/jms1/bin'
+#   MYNAME  name of script          'xyzzy'
+#   MYSELF  full path to script     '/Users/jms1/bin/xyzzy'
 
 MYDIR="$( cd -- "$( dirname -- "$0" )" >/dev/null 2>&1 || exit 1 ; pwd -P )"
 MYNAME="$( basename -- "$0" )"
@@ -61,7 +61,7 @@ MYSELF="$MYDIR/$MYNAME"
 
 ########################################
 # Directories used by the script itself
-# https://specifications.freedesktop.org/basedir-spec/latest/
+# XDG: https://specifications.freedesktop.org/basedir-spec/latest/
 
 CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/${MYNAME}"
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/${MYNAME}"
@@ -204,14 +204,14 @@ function show_x {
 # Debugging message
 
 DO_DEBUG="${DO_DEBUG:-false}"
-DEBUG_PREFIX="LOC"
+DEBUG_PREFIX=$'\f'
 
 function debug {
     local IFS LINE LINES PREFIX
 
     if [[ "${DO_DEBUG:-false}" == "true" ]]
     then
-        if [[ "$DEBUG_PREFIX" == "LOC" ]]
+        if [[ "$DEBUG_PREFIX" == $'\f' ]]
         then
             local CALLER C_LINE C_FILE
             CALLER="$( caller )"

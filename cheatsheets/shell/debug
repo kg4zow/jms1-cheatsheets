@@ -1,19 +1,16 @@
----
-syntax  : bash
----
 ###############################################################################
 #
 # Debugging message
 
 DO_DEBUG="${DO_DEBUG:-false}"
-DEBUG_PREFIX="LOC"
+DEBUG_PREFIX=$'\f'
 
 function debug {
     local IFS LINE LINES PREFIX
 
     if [[ "${DO_DEBUG:-false}" == "true" ]]
     then
-        if [[ "$DEBUG_PREFIX" == "LOC" ]]
+        if [[ "$DEBUG_PREFIX" == $'\f' ]]
         then
             local CALLER C_LINE C_FILE
             CALLER="$( caller )"
