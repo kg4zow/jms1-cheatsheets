@@ -1,0 +1,371 @@
+#!/bin/bash
+#
+# setup-cheat
+# jms1 2024-01-02
+LAST_UPDATED='2026-02-27'
+#
+###############################################################################
+#
+# MIT License (MIT)
+#
+# Copyright (C) 2024-2026 John Simpson
+#
+# Permission is hereby granted, free of charge, to any person obtaining a
+# copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+# DEALINGS IN THE SOFTWARE.
+#
+###############################################################################
+
+# Location of cheat's config file
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/cheat"
+
+# Community cheatsheets - URL and directory where it will be installed
+COMM_URL="https://github.com/cheat/cheatsheets"
+COMM_DIR="$HOME/git/cheat/cheatsheets"
+
+# Personal cheatsheets - URL and directory where it will be installed
+# - If you have your own cheatsheet repo
+#   - change PERL_URL to point to it. The value can be any URL that works in
+#     a 'git clone' command.
+#   - change PERS_DIR to point to the directory where you want the repo to
+#     be cloned
+#   - change PERS_SUB to point to the sub-directory within the repo which
+#     has the cheatsheet files in it
+# - If you don't have your own cheatsheet repo
+#   - comment out these three lines, or change their values to empty strings
+#     (i.e. PERS_URL='')
+#
+PERS_URL='git.jms1.net:jms1/cheatsheets'
+PERS_DIR="$HOME/git/jms1/cheatsheets"
+PERS_SUB='cheatsheets'
+
+# Possible editors, if neither $EDITOR nor $VISUAL are set
+# - The order is important. The *first* one that exists in $PATH will be used
+#   by 'cheat -e' commands. bbedit is what I use on macOS, mousepad is what I
+#   use on Debian.
+EDITORS=( bbedit mousepad nano vim vi )
+
+###############################################################################
+#
+# Shell functions to emit coloured lines
+
+############################################################
+# Slice and dice a message into lines, print each line in the selected colour
+# - first parameter is colour, will be inserted into "ESC [ ... m" sequence
+# - if more parmeters are present, each is a line (or multi-line)
+#   - parameters which are empty strings will generate blank coloured lines
+# - if no more parameters are present, STDIN will be split into lines
+#   - empty lines in input will become blank coloured lines
+#   - empty STDIN will generate no output
+
+function coloured_line {
+    local COL P IFS LINE LINES
+
+    COL="${1:?no colour code specified}"
+    shift
+
+    if (( $# > 0 ))
+    then
+        ########################################
+        # Each parameter may be one or more lines
+
+        for P in "$@"
+        do
+            if [[ -n "$P" ]]
+            then
+                IFS=$'\n' read -a LINES -d '' -r <<< "$P" || true
+                for LINE in "${LINES[@]}"
+                do
+                    printf "\e[%sm%s\e[0K\e[0m\n" "$COL" "$LINE"
+                done
+            else
+                printf "\e[%sm%s\e[0K\e[0m\n" "$COL" ''
+            fi
+        done
+    else
+        ########################################
+        # STDIN will contain one or more lines of text
+
+        while IFS='' read -r LINE
+        do
+            printf "\e[%sm%s\e[0K\e[0m\n" "$COL" "$LINE"
+        done
+    fi
+}
+
+function redline {
+    coloured_line '0;1;37;41' "$@"
+}
+
+function blueline {
+    coloured_line '0;1;37;44' "$@"
+}
+
+function cyanline {
+    coloured_line '0;1;37;46' "$@"
+}
+
+function fail {
+    redline "$@"
+    exit 1
+}
+
+###############################################################################
+#
+# Maybe show a command before executing it
+
+SET_X=false
+
+function set_x {
+    local IFS=' '
+    if [[ "${SET_X:-false}" == "true" ]]
+    then
+        cyanline "$PS4$*" 1>&2
+    fi
+    "$@"
+}
+
+###############################################################################
+#
+# Usage
+
+function usage {
+    local MSG="${*:-}"
+
+    cat <<EOF
+$0 [OPTIONS]
+
+Set things up to use 'cheat' on a new workstation.
+
+-x      Show the important commands before executing them.
+
+-h      Show this help message.
+
+Last updated $LAST_UPDATED
+
+EOF
+
+    if [[ -n "$MSG" ]]
+    then
+        fail "$MSG"
+    fi
+
+    exit 0
+}
+
+###############################################################################
+###############################################################################
+###############################################################################
+#
+# Proces the command line
+
+while getopts ':xh' OPT
+do
+    case $OPT in
+        x)  SET_X=true
+            ;;
+        h)  usage
+            ;;
+        *)  usage "ERROR: unknown option '-${OPTARG}'"
+            ;;
+    esac
+done
+
+shift $(( OPTIND - 1 ))
+
+###############################################################################
+#
+# Make sure 'cheat' is installed
+
+blueline "Making sure 'cheat' is installed"
+
+CHEAT="$( set_x which cheat )"
+if [[ -z "$CHEAT" ]]
+then
+    ########################################
+    # If 'brew' is available, use it to install 'cheat'
+
+    BREW="$( set_x which brew )"
+    if [[ -n "$BREW" ]]
+    then
+        echo "Installing 'cheat' from homebrew"
+        set_x "$BREW" install cheat
+        CHEAT="$( set_x which cheat )"
+    fi
+fi
+
+if [[ -z "$CHEAT" ]]
+then
+    redline "ERROR: 'cheat' is not installed"
+    cat <<EOF
+
+Also, 'brew' is not present, which means this script can't install it for you.
+
+See https://github.com/cheat/cheat/blob/master/INSTALLING.md for directions
+on how to install it, then run this script again.
+
+EOF
+    exit 1
+fi
+
+############################################################
+# Set up cheat auto-complete
+# - note that 'cheat --completion' only exists in cheat v5.0 and later
+#   https://github.com/cheat/cheat/issues/768
+# - keep going if the completion file can't be installed
+
+blueline "Writing shell completion file"
+
+CHEAT_VER="$( set_x cheat --version )"
+echo "cheat version $CHEAT_VER"
+
+if [[ "$CHEAT_VER" > 5 ]]
+then
+    if [[ -d "$HOME/.bashrc.d" ]]
+    then
+        set_x cheat --completion bash > "$HOME/.bashrc.d/82.cheat"
+    else
+        yellowline "Not writing shell completion file, '$HOME/.bashrc.d' is not a directory"
+    fi
+else
+    yellowline "Not writing shell completion file, update 'cheat' to version 5.0 or later"
+fi
+
+############################################################
+# Identify the editor
+
+blueline "Identifying your preferred editor"
+
+if [[ -n "${EDITOR:-}" ]]
+then
+    echo "using \$EDITOR '$EDITOR'"
+    ED="$EDITOR"
+elif [[ -n "${VISUAL:-}" ]]
+then
+    echo "using \$VISUAL '$VISUAL'"
+    ED="$VISUAL"
+else
+    echo "searching PATH for first of (${EDITORS[*]})"
+    ED="$( set_x which "${EDITORS[@]}" | head -1 )"
+
+    if [[ -z "$ED" ]]
+    then
+        fail "ERROR: unable to find an editor"
+    fi
+fi
+
+echo "Using $ED as the editor for 'cheat -e' commands"
+
+############################################################
+# Clone the community cheatsheets
+
+if [[ ! -d "$COMM_DIR/.git" ]]
+then
+    blueline "Cloning community cheatsheets"
+    set_x git clone "$COMM_URL" "$COMM_DIR" || exit 1
+else
+    blueline "Updating community cheatsheets"
+    ( set_x cd "$COMM_DIR" && set_x git fetch -p && set_x git pull )
+fi
+
+############################################################
+# Maybe clone personal cheatsheets
+
+if [[ -n "$PERS_URL" ]]
+then
+    if [[ ! -d "$PERS_DIR/.git" ]]
+    then
+        blueline "Cloning personal cheatsheets"
+        set_x git clone "$PERS_URL" "$PERS_DIR" \
+            || fail 'ERROR: clone failed'
+    else
+        blueline "Updating personal cheatsheets"
+        ( set_x cd "$PERS_DIR" && set_x git fetch -p && set_x git pull ) \
+            || fail 'ERROR: update failed'
+    fi
+fi
+
+############################################################
+# Write cheat's config file
+
+blueline "Installing $CONFIG_DIR/conf.yml"
+
+########################################
+# Make sure the config file's directory exists
+
+if ! [[ -d "$CONFIG_DIR" ]]
+then
+    set_x mkdir -p "$CONFIG_DIR"
+fi
+
+########################################
+# Write default config that every machine gets
+
+echo 'defaults'
+cat > "$CONFIG_DIR/conf.yml" <<EOF
+# Config file for 'cheat'
+# https://github.com/cheat/cheat
+---
+# The editor to use with 'cheat -e <sheet>'. Defaults to $EDITOR or $VISUAL.
+editor: ${ED}
+
+# Should 'cheat' always colorize output?
+colorize: true
+
+# Which 'chroma' colorscheme should be applied to the output?
+# Options are available here:
+#   https://github.com/alecthomas/chroma/tree/master/styles
+style: monokai
+
+# Which 'chroma' "formatter" should be applied?
+# One of: "terminal", "terminal256", "terminal16m"
+formatter: terminal256
+
+# Through which pager should output be piped?
+# 'less -FRX' is recommended on Unix systems
+# macOS/Linux are recommended on Windows
+pager: less -FRX
+
+# Cheatpaths are paths at which cheatsheets are available on your local
+# filesystem.
+cheatpaths:
+  - name     : community
+    path     : ${COMM_DIR}
+    tags     : [ community ]
+    readonly : true
+EOF
+
+########################################
+# If we have a personal set of cheatsheets, add that to the list
+# - the repo should already have been cloned on the machine
+
+if [[ -n "$PERS_URL" ]]
+then
+    if [[ -d "$PERS_DIR/$PERS_SUB" ]]
+    then
+        echo "personal"
+        cat >> "$CONFIG_DIR/conf.yml" <<EOF
+
+  - name     : personal
+    path     : ${PERS_DIR}/${PERS_SUB}
+    tags     : [ personal ]
+    readonly : false
+EOF
+    else
+        echo "- NO personal, '$PERS_DIR/$PERS_SUB' does not exist"
+    fi
+fi
