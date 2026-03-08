@@ -1,0 +1,35 @@
+###############################################################################
+#
+# Debug message
+# - Splits the message into lines, adds a prefix to each line, and prints the
+#   result using `yellowline()`.
+# - The prefix is set using the global variable `$debug_prefix`.
+# - If the prefix is "\f" (formfeed), use the caller's "filename:line" as
+#   the prefix. I chose this because I wanted to use the empty string for
+#   "no prefix", and because it's unusual enough that I doubt anybody would
+#   have any need to use it.
+
+my $debug_prefix = "\f" ;
+
+sub debug(@)
+{
+    my $msg = join( '' , @_ ) ;
+
+    ########################################
+    # Figure out what the prefix will be
+
+    my $pre = $debug_prefix ;
+    if ( $pre eq "\f" )
+    {
+        my @c = caller( 1 ) ;
+        $pre = sprintf( "%s:%d" , $c[1] , $c[2] ) ;
+    }
+
+    ########################################
+    # Print the debug lines
+
+    for my $line ( split( m|\r?\n| , $msg ) )
+    {
+        yellowline "$pre$line" ;
+    }
+}

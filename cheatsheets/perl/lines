@@ -1,0 +1,59 @@
+###############################################################################
+#
+# Coloured line functions
+#
+# Note: to include extra "blank" coloured lines
+# - above: start the string with "\n"
+# - below: end the string with "\n " (last character is a space)
+
+sub coloured_line($@)
+{
+    my $col = shift ;
+    my $msg = join( '' , @_ ) ;
+
+    for my $line ( split( m|\r?\n| , $msg ) )
+    {
+        printf "\e[0;%sm%s\e[K\n" , $col , $line ;
+    }
+}
+
+sub redline(@)
+{
+    coloured_line( '0;1;37;41' , @_ ) ;
+}
+
+sub yellowline(@)
+{
+    coloured_line( '0;30;43' , @_ ) ;
+}
+
+sub blueline(@)
+{
+    coloured_line( '0;1;37;44' , @_ ) ;
+}
+
+sub greenline(@)
+{
+    coloured_line( '0;1;37;42' , @_ ) ;
+}
+
+sub cyanline(@)
+{
+    coloured_line( '0;1;37;46' , @_ ) ;
+}
+
+sub purpleline(@)
+{
+    coloured_line( '0;1;37;45' , @_ ) ;
+}
+
+sub whiteline(@)
+{
+    coloured_line( '0;1;37;47' , @_ ) ;
+}
+
+sub fail(@)
+{
+    redline( @_ ) ;
+    exit 1 ;
+}
