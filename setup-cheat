@@ -2,7 +2,7 @@
 #
 # setup-cheat
 # jms1 2024-01-02
-LAST_UPDATED='2026-02-27'
+LAST_UPDATED='2026-03-07'
 #
 ###############################################################################
 #
@@ -52,12 +52,6 @@ COMM_DIR="$HOME/git/cheat/cheatsheets"
 PERS_URL='git.jms1.net:jms1/cheatsheets'
 PERS_DIR="$HOME/git/jms1/cheatsheets"
 PERS_SUB='cheatsheets'
-
-# Possible editors, if neither $EDITOR nor $VISUAL are set
-# - The order is important. The *first* one that exists in $PATH will be used
-#   by 'cheat -e' commands. bbedit is what I use on macOS, mousepad is what I
-#   use on Debian.
-EDITORS=( bbedit mousepad nano vim vi )
 
 ###############################################################################
 #
@@ -246,31 +240,6 @@ else
 fi
 
 ############################################################
-# Identify the editor
-
-blueline "Identifying your preferred editor"
-
-if [[ -n "${EDITOR:-}" ]]
-then
-    echo "using \$EDITOR '$EDITOR'"
-    ED="$EDITOR"
-elif [[ -n "${VISUAL:-}" ]]
-then
-    echo "using \$VISUAL '$VISUAL'"
-    ED="$VISUAL"
-else
-    echo "searching PATH for first of (${EDITORS[*]})"
-    ED="$( set_x which "${EDITORS[@]}" | head -1 )"
-
-    if [[ -z "$ED" ]]
-    then
-        fail "ERROR: unable to find an editor"
-    fi
-fi
-
-echo "Using $ED as the editor for 'cheat -e' commands"
-
-############################################################
 # Clone the community cheatsheets
 
 if [[ ! -d "$COMM_DIR/.git" ]]
@@ -320,8 +289,8 @@ cat > "$CONFIG_DIR/conf.yml" <<EOF
 # Config file for 'cheat'
 # https://github.com/cheat/cheat
 ---
-# The editor to use with 'cheat -e <sheet>'. Defaults to $EDITOR or $VISUAL.
-editor: ${ED}
+# The editor to use with 'cheat -e <sheet>'. Defaults to \$EDITOR or \$VISUAL.
+#editor:
 
 # Should 'cheat' always colorize output?
 colorize: true
