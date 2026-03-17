@@ -2,7 +2,7 @@
 #
 # script-name
 # Author <email@example.com> 2020-02-02
-readonly LAST_UPDATED="2026-02-22"
+readonly LAST_UPDATED="2026-03-17"
 #
 # Quick description of what the script does.
 #
@@ -91,7 +91,7 @@ echo "STATE_DIR='$STATE_DIR'" > /dev/null
 #   - empty STDIN will generate no output
 
 function coloured_line {
-    local COL P IFS LINE LINES
+    local COL P IFS LINE
 
     ########################################
     # The first parameter (required) is the 'n;n;n' code used in the escape
@@ -236,7 +236,8 @@ function debug {
 # - https://docopt.org/ is the "standard" for how to describe options
 
 function usage {
-    local MSG="${*:-}"
+    local MSG
+    MSG="${*:-}"
 
     cat <<EOF
 $0 [OPTIONS] [ARGS]
