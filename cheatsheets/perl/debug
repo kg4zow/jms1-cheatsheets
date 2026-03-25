@@ -1,35 +1,45 @@
 ###############################################################################
 #
-# Debug message
-# - Splits the message into lines, adds a prefix to each line, and prints the
-#   result using `yellowline()`.
+# Debugging message. Print a message in yellow, but only if debugging is
+# enabled.
+#
+# - Combine the arguments (each containing one or more lines of text) into
+#   a single string.
+# - Split the combined message into lines, adds a prefix to each line, and
+#   print each line of the result using `yellowline()`.
 # - The prefix is set using the global variable `$debug_prefix`.
+#   - If changing the prefix, be sure to include a space at the end, unless
+#     you want the messages "touching" the prefix.
 # - If the prefix is "\f" (formfeed), use the caller's "filename:line" as
-#   the prefix. I chose this because I wanted to use the empty string for
-#   "no prefix", and because it's unusual enough that I doubt anybody would
-#   have any need to use it.
+#   the prefix. I chose this value because ...
+#   - I wanted to be able to use the empty string for "no prefix"
+#   - I didn't want to use a non-ASCII character
+#   - It's not something I can see people wanting to use "for real"
 
 my $debug_prefix = "\f" ;
 
 sub debug(@)
 {
-    my $msg = join( '' , @_ ) ;
-
-    ########################################
-    # Figure out what the prefix will be
-
-    my $pre = $debug_prefix ;
-    if ( $pre eq "\f" )
+    if ( $do_debug )
     {
-        my @c = caller( 1 ) ;
-        $pre = sprintf( "%s:%d" , $c[1] , $c[2] ) ;
-    }
+        my $msg = join( '' , @_ ) ;
 
-    ########################################
-    # Print the debug lines
+        ########################################
+        # Figure out what the prefix will be
 
-    for my $line ( split( m|\r?\n| , $msg ) )
-    {
-        yellowline "$pre$line" ;
+        my $pre = $debug_prefix ;
+        if ( $pre eq "\f" )
+        {
+            my @c = caller( 0 ) ;
+            $pre = sprintf( "%s:%d: " , $c[1] , $c[2] ) ;
+        }
+
+        ########################################
+        # Print the debug lines
+
+        for my $line ( split( m|\r?\n| , $msg ) )
+        {
+            yellowline "$pre$line" ;
+        }
     }
 }
