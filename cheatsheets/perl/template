@@ -1,0 +1,259 @@
+#!/usr/bin/env perl
+#
+# script-name
+# Author <email> 2026-03-25
+my $LAST_UPDATED = '2026-03-25' ;
+#
+# Brief description of what the script does
+#
+###############################################################################
+#
+# Portions of the script are from a template created by John Simpson, who has
+# released them under the MIT License.
+#
+# MIT License
+#
+# Copyright (C) 2025-2026 John Simpson
+#
+# Permission is hereby granted, free of charge, to any person obtaining a
+# copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+# DEALINGS IN THE SOFTWARE.
+#
+###############################################################################
+#
+# The remaining contents of the script are covered under this license:
+#
+# (License Name)
+#
+# Copyright (C) 2026 whoever
+#
+# Details about this script's licensing
+#
+###############################################################################
+
+require 5.005 ;
+use strict ;
+use warnings ;
+
+use Getopt::Long qw ( GetOptionsFromArray :config require_order bundling ) ;
+
+############################################################
+# Variables meant to be configured by the end user
+
+############################################################
+# Global variables meant to be read from a config file
+
+############################################################
+# Global variables only set within the script
+
+my $set_x       = 0 ;       # -x
+my $do_debug    = 0 ;       # --debug   or -D
+my $opt_a       = 0 ;       # --alfa    or -a
+my $opt_b       = 0 ;       # --bool    or -b, reset with --nobool or --no-bool
+my $opt_i       = 0 ;       # --int:    or -i:
+my $opt_s       = '' ;      # --string: or -s:
+
+###############################################################################
+#
+# Coloured line functions
+#
+# Note: to include extra "blank" coloured lines
+# - above: start the string with "\n"
+# - below: end the string with "\n " (last character is a space)
+
+sub coloured_line($@)
+{
+    my $col = shift ;
+    my $msg = join( '' , @_ ) ;
+
+    for my $line ( split( m|\r?\n| , $msg ) )
+    {
+        printf "\e[0;%sm%s\e[K\e[0m\n" , $col , $line ;
+    }
+}
+
+sub redline(@)
+{
+    coloured_line( '0;1;37;41' , @_ ) ;
+}
+
+sub yellowline(@)
+{
+    coloured_line( '0;30;43' , @_ ) ;
+}
+
+sub blueline(@)
+{
+    coloured_line( '0;1;37;44' , @_ ) ;
+}
+
+sub greenline(@)
+{
+    coloured_line( '0;1;37;42' , @_ ) ;
+}
+
+sub cyanline(@)
+{
+    coloured_line( '0;1;37;46' , @_ ) ;
+}
+
+sub purpleline(@)
+{
+    coloured_line( '0;1;37;45' , @_ ) ;
+}
+
+sub whiteline(@)
+{
+    coloured_line( '0;1;37;47' , @_ ) ;
+}
+
+sub fail(@)
+{
+    redline( @_ ) ;
+    exit 1 ;
+}
+
+###############################################################################
+#
+# Debugging message. Print a message in yellow, but only if debugging is
+# enabled.
+#
+# - Combine the arguments (each containing one or more lines of text) into
+#   a single string.
+# - Split the combined message into lines, adds a prefix to each line, and
+#   print each line of the result using `yellowline()`.
+# - The prefix is set using the global variable `$debug_prefix`.
+#   - If changing the prefix, be sure to include a space at the end, unless
+#     you want the messages "touching" the prefix.
+# - If the prefix is "\f" (formfeed), use the caller's "filename:line" as
+#   the prefix. I chose this value because ...
+#   - I wanted to be able to use the empty string for "no prefix"
+#   - I didn't want to use a non-ASCII character
+#   - It's not something I can see people wanting to use "for real"
+
+my $debug_prefix = "\f" ;
+
+sub debug(@)
+{
+    if ( $do_debug )
+    {
+        my $msg = join( "\n" , @_ ) ;
+
+        ########################################
+        # Figure out what the prefix will be
+
+        my $pre = $debug_prefix ;
+        if ( $pre eq "\f" )
+        {
+            my @c = caller( 0 ) ;
+            $pre = sprintf( "%s:%d: " , $c[1] , $c[2] ) ;
+        }
+
+        ########################################
+        # Print the debug lines
+
+        for my $line ( split( m|\r?\n| , $msg ) )
+        {
+            yellowline "$pre$line" ;
+        }
+    }
+}
+
+###############################################################################
+#
+# Usage
+
+sub usage(;$)
+{
+    my $msg = ( shift || '' ) ;
+
+    print <<EOF ;
+$0 [OPTIONS] [ARGS]
+
+Description of what the script does.
+
+-a, --alfa      Example boolean option. Default false, option sets to true.
+                  Once this option has been set, there is no way to "un-set"
+                  it from command line.
+
+-b, --bool      Example boolean option. Default false, option sets to true.
+--nobool        Using '--nobool' or '--no-bool' will "unset" an earlier '-a'
+--no-bool         or '-b' option.
+
+-i ___          Example integer option.
+--int ___
+
+-s ___          Example string option.
+--string ___
+
+-h, --help      Show this usage message.
+
+-x              Show external commands being executed.
+
+-D, --debug     Show debugging messages. This also enables '-x'.
+
+Last updated $LAST_UPDATED
+
+EOF
+
+    if ( $msg ne '' )
+    {
+        fail $msg ;
+    }
+
+    exit 0 ;
+}
+
+###############################################################################
+###############################################################################
+###############################################################################
+#
+# Parse command line
+
+GetOptions(
+    'h|help'        => sub{ usage() ; } ,
+    'a|alfa'        => \$opt_a ,
+    'b|bool!'       => \$opt_b ,
+    'i|int=i'       => \$opt_i ,
+    's|string=s'    => \$opt_s ,
+    'x'             => \$set_x          ,
+    'D|debug'       => \$do_debug       ,
+) or usage "ERROR: GetOptions() failed\n" ;
+
+$do_debug && ( $set_x =1 ) ;
+
+###############################################################################
+#
+# Do the deed
+
+debug <<EOF ;
+\$opt_a     '$opt_a'
+\$opt_b     '$opt_b'
+\$opt_i     '$opt_i'
+\$opt_s     '$opt_s'
+\$set_x     '$set_x'
+\$do_debug  '$do_debug'
+EOF
+
+print <<EOF ;
+\$opt_a     '$opt_a'
+\$opt_b     '$opt_b'
+\$opt_i     '$opt_i'
+\$opt_s     '$opt_s'
+\$set_x     '$set_x'
+\$do_debug  '$do_debug'
+EOF
