@@ -13,7 +13,7 @@ sub coloured_line($@)
 
     for my $line ( split( m|\r?\n| , $msg ) )
     {
-        printf "\e[0;%sm%s\e[K\n" , $col , $line ;
+        printf "\e[0;%sm%s\e[K\e[0m\n" , $col , $line ;
     }
 }
 
