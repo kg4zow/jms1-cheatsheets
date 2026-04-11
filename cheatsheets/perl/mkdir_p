@@ -1,0 +1,65 @@
+---
+syntax : perl
+---
+###############################################################################
+#
+# Create a directory, plus any parent directories
+# - recursive version
+
+sub mkdir_p($;$) ;
+sub mkdir_p($;$)
+{
+    my $dir  = shift ;
+    my $mode = ( shift || 0777 ) ;
+
+    if ( -d $dir )
+    {
+        return ;
+    }
+
+    $dir =~ m|^(.+)/(.+)$| ;
+    my ( $parent , $this ) = ( $1 , $2 ) ;
+
+    if ( ! -d $parent )
+    {
+        mkdir_p( $parent , $mode ) ;
+    }
+
+    mkdir( $dir , $mode )
+        or fail "ERROR: mkdir('$dir'): $!" ;
+}
+
+###############################################################################
+#
+# Create a directory, plus any parent directories
+# - non-recursive version
+
+sub mkdir_p($;$)
+{
+    my $dir  =   shift ;
+    my $mode = ( shift || 0777 ) ;
+
+    $dir =~ s|/$|| ;
+    $dir =~ s|/+|/|g ;
+
+    ########################################
+    # Build a list of directories which don't exist
+
+    my @mk = () ;
+
+    while ( ! -d $dir )
+    {
+        push( @mk , $dir ) ;
+        $dir =~ s|^(.*)/.*$|$1| ;
+    }
+
+    ########################################
+    # Create the necessary directories
+
+    for my $d ( reverse @mk )
+    {
+        mkdir( $d , $mode )
+            or die "ERROR: mkdir('$d'): $!\n" ;
+    }
+
+}
