@@ -2,7 +2,7 @@
 #
 # script-name
 # Author <email@example.com> 2020-02-02
-readonly LAST_UPDATED="2026-03-17"
+readonly LAST_UPDATED="2026-04-11"
 #
 # Quick description of what the script does.
 #
@@ -51,13 +51,19 @@ PATH="/usr/bin:/bin"
 
 ########################################
 # Global variables
-#   MYDIR   dir containing script   '/Users/jms1/bin'
-#   MYNAME  name of script          'xyzzy'
-#   MYSELF  full path to script     '/Users/jms1/bin/xyzzy'
+#   MYDIR     dir containing script   '/Users/jms1/bin'
+#   MYNAME    name of script          'xyzzy'
+#   MYSELF    full path to script     '/Users/jms1/bin/xyzzy'
+#   REAL_XXX  if $MYSELF is a symlink, the REAL_XXX variables will have the
+#             same values, for the real target of that symlink
 
 MYDIR="$( cd -- "$( dirname -- "$0" )" >/dev/null 2>&1 || exit 1 ; pwd -P )"
 MYNAME="$( basename -- "$0" )"
 MYSELF="$MYDIR/$MYNAME"
+
+REAL_MYSELF="$( readlink -f "$MYSELF" )"
+REAL_MYDIR="${REAL_MYSELF%/*}"
+REAL_MYNAME="${REAL_MYSELF##*/}"
 
 ########################################
 # Directories used by the script itself
@@ -69,12 +75,6 @@ DATA_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/${MYNAME}"
 STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/${MYNAME}"
 
 CONFIG_FILE="${CONFIG_DIR}/${MYNAME}.conf"
-
-# dummy entries to make shellcheck not complain about un-used variables
-echo "CACHE_DIR='$CACHE_DIR'" > /dev/null
-echo "CONFIG_DIR='$CONFIG_DIR'" > /dev/null
-echo "DATA_DIR='$DATA_DIR'" > /dev/null
-echo "STATE_DIR='$STATE_DIR'" > /dev/null
 
 ###############################################################################
 #
@@ -254,7 +254,10 @@ Detailed description of what the script does.
 
 -h      Show this help message.
 
-Note: two arguments are required in order to do anything.
+Note: part of the example code below illustrates how to handle cases where
+a certain number of parameters are required, but show the usage message if
+no parameters are supplied. This means in order to see the final message
+you will need to specify at least two arguments.
 
 Last updated $LAST_UPDATED
 
@@ -315,12 +318,28 @@ fi
 #
 # Do the things
 
-echo "MYDIR='${MYDIR}'"
-echo "MYNAME='${MYNAME}'"
-echo "MYSELF='${MYSELF}'"
-echo "CONFIG_DIR='${CONFIG_DIR}'"
-echo "CONFIG_FILE='${CONFIG_FILE}'"
-echo "BVAR='${BVAR}'"
-echo "SVAR='${SVAR}'"
-echo "ARG1='${ARG1}'"
-echo "ARG2='${ARG2}'"
+cat <<EOF
+MYDIR       '${MYDIR}'
+MYNAME      '${MYNAME}'
+MYSELF      '${MYSELF}'
+REAL_MYSELF '${REAL_MYSELF}'
+REAL_MYDIR  '${REAL_MYDIR}'
+REAL_MYNAME '${REAL_MYNAME}'
+
+CACHE_DIR   '${CACHE_DIR}'
+CONFIG_DIR  '${CONFIG_DIR}'
+DATA_DIR    '${DATA_DIR}'
+STATE_DIR   '${STATE_DIR}'
+CONFIG_FILE '${CONFIG_FILE}'
+
+SET_X       '${SET_X}'
+DO_DEBUG    '${DO_DEBUG}'
+
+BVAR        '${BVAR}'
+SVAR        '${SVAR}'
+ARG1        '${ARG1}'
+ARG2        '${ARG2}'
+
+\$*         '$*'
+\$@         '$@'
+EOF
