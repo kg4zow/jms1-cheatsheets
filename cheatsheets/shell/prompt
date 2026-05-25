@@ -1,0 +1,9 @@
+---
+syntax  : bash
+---
+# Add colour to existing prompt (for use in container etc.)
+
+PS1ns="${PS1%% }"
+PS1="\[\e[0;1;32;41m\]$PS1ns\[\e[0m\] "
+export PS1
+
