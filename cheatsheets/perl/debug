@@ -1,3 +1,6 @@
+---
+syntax : perl
+---
 ###############################################################################
 #
 # Debugging message. Print a message in yellow, but only if debugging is

@@ -1,3 +1,6 @@
+---
+syntax: bash
+---
 # THIS OVERRIDES THE `cheat` CHEATSHEET FROM THE COMMUNITY REPO
 #   https://github.com/cheat/cheatsheets
 
@@ -26,6 +29,9 @@ cheat x | pbcopy
 - YAML front-matter ... `syntax : perl`
 - https://github.com/alecthomas/chroma/ ... repo README has language list
 - useful: bash c perl
+
+# Source a cheatsheet (containing shell functions) into the current shell
+source <( cheat shell/lines )
 
 # My config - $HOME/.config/cheat/conf.yml
 editor: /PATH/TO/bbedit

@@ -1,3 +1,6 @@
+---
+syntax : perl
+---
 #!/usr/bin/env perl
 #
 # script-name

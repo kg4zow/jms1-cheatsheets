@@ -1,11 +1,14 @@
 ---
-syntax  : bash
+syntax : bash
 ---
 ###############################################################################
 #
-# Send a copy of all output to a log file
-# - original output goes to STDOUT, un-modified
-# - copy goes to the log file, with timestamps added
+# Send a copy of all output to a log file, with timestamps added.
+#
+# This function should be run like so, so the normal output (without
+# timestamps) goes to STDOUT, and the lines in the logfile have timestamps.
+#
+#   COMMAND | tee >( tslogfile "$LOGFILE" ) 2>&1
 
 function tslogfile {
     local LOGFILE TSFORMAT ARG IFS LINE
@@ -46,7 +49,6 @@ function tslogfile {
         do
             while IFS='' read -r LINE
             do
-                echo "$LINE"
                 printf "%s %s\n" "$( date -u "$TSFORMAT" )" "$LINE" >> "$LOGFILE"
             done <<< "$ARG"
         done
@@ -59,7 +61,6 @@ function tslogfile {
     else
         while IFS='' read -r LINE
         do
-            echo "$LINE"
             printf "%s %s\n" "$( date -u "$TSFORMAT" )" "$LINE" >> "$LOGFILE"
         done
     fi
