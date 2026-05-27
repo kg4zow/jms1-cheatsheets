@@ -1,0 +1,57 @@
+---
+syntax  : bash
+---
+###############################################################################
+#
+# Print a "permanent" message on the top line of the screen.
+# - If no message is specified, reset the scrolling region.
+# - The '\e' character does not work with bash v3's `echo -e` command, but
+#   it does work with `printf` (under both vash v3 and v5)
+
+TOPLINE_COLOUR='0;1;37;41'
+
+function topline {
+    local MSG
+    MSG="${1:-}"
+
+    ########################################
+    # If we have a message, do the deed
+    #
+    # \e 7              save cursor position/attributes
+    # \e [ H            move to top left
+    # \e [ (xxx) m      set colour
+    # MSG
+    # \e [ K            clear to end of line
+    # \e [ 2 r          set scrolling region to lines 2 through bottom
+    # \e 8              restore cursor position/attributes
+
+    if [[ -n "$MSG" ]]
+    then
+        printf '\e7\e[H\e[%sm%s\e[K\e[2r\e8' "$TOPLINE_COLOUR" "$MSG"
+
+    ########################################
+    # Otherwise, reset the scrolling region
+    #
+    # \e 7              save cursor position/attributes
+    # \e [ r            reset scrolling region
+    # \e 8              restore cursor position/attributes
+
+    else
+        printf '\e7\e[r\e8'
+    fi
+}
+
+############################################################
+# Minimal version, if comments are not needed
+
+function topline {
+    local MSG
+    MSG="${1:-}"
+
+    if [[ -n "$MSG" ]]
+    then
+        printf '\e7\e[H\e[%sm%s\e[K\e[2r\e8' "$TOPLINE_COLOUR" "$MSG"
+    else
+        printf '\e7\e[r\e8'
+    fi
+}
