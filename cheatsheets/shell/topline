@@ -12,7 +12,7 @@ TOPLINE_COLOUR='0;1;37;41'
 
 function topline {
     local MSG
-    MSG="${1:-}"
+    MSG="${*:-}"
 
     ########################################
     # If we have a message, do the deed
@@ -46,7 +46,7 @@ function topline {
 
 function topline {
     local MSG
-    MSG="${1:-}"
+    MSG="${*:-}"
 
     if [[ -n "$MSG" ]]
     then
