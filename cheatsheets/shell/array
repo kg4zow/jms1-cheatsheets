@@ -113,3 +113,23 @@ function debug_array_name {
         done
     fi
 }
+
+############################################################
+# Arrays cannot be exported directly. The best we can do is to
+# print an 'ARRAY=(...)' command that can later be source'd.
+# Note that this may not work if any ARRAY values contain
+# double-quote characters.
+
+function print_export_array {
+    local ARRAY
+
+    ARRAY="${1:?print_export_array: no array name specified}"
+    shift
+
+    echo -n "$ARRAY=("
+    while [[ -n "${1:-}" ]]
+    do
+        echo -n " \"$1\""
+    done
+    echo " )"
+}

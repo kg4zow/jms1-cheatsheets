@@ -4,6 +4,8 @@ syntax  : bash
 ###############################################################################
 #
 # Debugging message
+#
+# NOTE: this uses the 'yellowline' function, see the 'shell/lines' cheatsheet
 
 DO_DEBUG="${DO_DEBUG:-false}"
 DEBUG_PREFIX=$'\f'

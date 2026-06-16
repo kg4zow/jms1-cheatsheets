@@ -1,8 +1,13 @@
 ---
 syntax  : bash
 ---
-########################################
+###############################################################################
+#
 # Maybe print a command before executing it
+#
+# NOTE: these functions use the 'cyanline' function. See the 'shell/lines'
+# cheatsheet. If you can't or don't want to use that function, you can change
+# 'cyanline' to 'echo'.
 
 SET_X="${SET_X:-false}"
 
@@ -10,19 +15,19 @@ function set_x {
     local IFS=' '
     if [[ "${SET_X:-false}" == "true" ]]
     then
-        echo "$PS4$*" 1>&2
+        cyanline "$PS4$*" 1>&2
     fi
     "$@"
 }
 
 ########################################
 # Show the same output that set_x would show,
-# but don't actually run the command
+# but don't actually run the command.
 
 function show_x {
     local IFS=' '
     if [[ "${SET_X:-false}" == "true" ]]
     then
-        echo "$PS4$*" 1>&2
+        cyanline "$PS4$*" 1>&2
     fi
 }
