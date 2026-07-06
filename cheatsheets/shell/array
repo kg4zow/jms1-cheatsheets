@@ -115,10 +115,10 @@ function debug_array_name {
 }
 
 ############################################################
-# Arrays cannot be exported directly. The best we can do is to
-# print an 'ARRAY=(...)' command that can later be source'd.
-# Note that this may not work if any ARRAY values contain
-# double-quote characters.
+# Export an array. Note that arrays cannot be exported directly. The
+# best we can do is to print an 'ARRAY=(...)' command that can later be
+# source'd to re-create the same array. Note that this may not work if
+# any ARRAY values contain double-quote characters.
 
 function print_export_array {
     local ARRAY
@@ -133,3 +133,26 @@ function print_export_array {
     done
     echo " )"
 }
+
+############################################################
+# Shift items from an array
+
+ARRAY=( a b c )
+echo "${ARRAY[@]}" "(${#ARRAY[@]})"
+a b c (3)
+
+RV="${ARRAY[0]}"
+ARRAY=( "${ARRAY[@]:1}" )
+echo "${ARRAY[@]}" "(${#ARRAY[@]})"
+b c (2)
+
+############################################################
+# Unshift items from an array (add element to beginning)
+
+ARRAY=( a b c )
+echo "${ARRAY[@]}" "(${#ARRAY[@]})"
+a b c (3)
+
+ARRAY=( n "${ARRAY[@]:1}" )
+echo "${ARRAY[@]}" "(${#ARRAY[@]})"
+n a b c (4)
