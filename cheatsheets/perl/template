@@ -5,7 +5,7 @@ syntax : perl
 #
 # script-name
 # Author <email> 2026-03-25
-my $LAST_UPDATED = '2026-03-25' ;
+my $LAST_UPDATED = '2026-07-07' ;
 #
 # Brief description of what the script does
 #
@@ -16,7 +16,7 @@ my $LAST_UPDATED = '2026-03-25' ;
 #
 # MIT License
 #
-# Copyright (C) 2025-2026 John Simpson
+# Copyright (C) 2026 John Simpson
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -203,11 +203,11 @@ Description of what the script does.
 -s ___          Example string option.
 --string ___
 
--h, --help      Show this usage message.
-
 -x              Show external commands being executed.
 
 -D, --debug     Show debugging messages. This also enables '-x'.
+
+-h, --help      Show this usage message.
 
 Last updated $LAST_UPDATED
 
@@ -228,16 +228,16 @@ EOF
 # Parse command line
 
 GetOptions(
-    'h|help'        => sub{ usage() ; } ,
     'a|alfa'        => \$opt_a ,
     'b|bool!'       => \$opt_b ,
     'i|int=i'       => \$opt_i ,
     's|string=s'    => \$opt_s ,
     'x'             => \$set_x          ,
     'D|debug'       => \$do_debug       ,
+    'h|help'        => sub{ usage() ; } ,
 ) or usage "ERROR: GetOptions() failed\n" ;
 
-$do_debug && ( $set_x =1 ) ;
+$set_x |= $do_debug ;
 
 ###############################################################################
 #
