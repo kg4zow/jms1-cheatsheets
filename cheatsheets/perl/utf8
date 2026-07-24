@@ -1,0 +1,8 @@
+---
+syntax : perl
+---
+# if script file contains UTF8 characters
+use utf8 ;
+
+# assume all files are UTF8
+use open qw( :std :encoding(UTF-8) ) ;
