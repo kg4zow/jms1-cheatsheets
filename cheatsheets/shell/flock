@@ -1,0 +1,60 @@
+---
+syntax  : bash
+---
+** NOT 100% SURE THIS IS FINISHED **
+-jms1 2026-07-24 Fri
+
+########################################
+# install
+
+* Alma10: `yum install util-linux-core`
+* macOS: `brew install util-linux`
+
+########################################
+# options
+
+-s          shared lock (one writer, many readers)
+-x          exclusive lock (default)
+-u          remove a lock
+-n          immediately fail rather than waiting
+-w SEC      wait up to SEC seconds before failing
+-E nnn      exit code when failing
+-o          close FD before running command
+--verbose   verbose
+-c CMD      run CMD using $SHELL
+-F          no fork, just exec
+
+########################################
+# run cmd with lock (LOCKFILE can be file or dir)
+
+flock LOCKFILE CMD
+flock LOCKFILE -c CMD
+
+########################################
+# using FD
+# - not sure when this would be useful
+
+LOCKFILE="/tmp/xyz"
+trap 'rm -f "$LOCKFILE'" EXIT
+(
+    flock 200
+    echo "acquired lock"
+    sleep 10
+    echo "releasing lock"
+) 200>"$LOCKFILE"
+
+########################################
+# use mkdir instead
+# - mkdir without `-f` exits 1 if dir already exists
+
+TRIES=10
+while ! mkdir /tmp/xyz.lock 2>/dev/null
+do
+    (( TRIES -- ))
+    if (( TRIES < 1 ))
+    then
+        break
+    fi
+    sleep 1
+done
+rmdir /tmp/xyz.lock

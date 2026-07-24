@@ -1,0 +1,130 @@
+---
+syntax  : bash
+---
+** NOT 100% SURE THIS IS FINISHED **
+-jms1 2026-07-24 Fri
+
+###############################################################################
+#
+# Use a temp directory as a "lockfile" of sorts, to ensure that only one
+# thread/process accesses (something) at a time. This works without needing
+# the `flock` utility, which is not present by default on macOS machines.
+#
+# - If you call 'lockdir LOCKDIR TIMEOUT COMMAND', this will run COMMAND
+#   while the lock is asserted, then remove the lock afterward.
+# - If you call 'lockdir LOCKDIR TIMEOUT' (without a COMMAND), this will
+#   assert the lock (i.e. create the directory) and return, and the caller
+#   will need to call 'unlockdir LOCKDIR' to release the lock (or just
+#   remove the directory using 'rmdir LOCKDIR' or 'rm -r LOCKDIR')
+
+function lockdir {
+    local LOCKDIR TIMEOUT COMMAND
+
+    LOCKDIR="${1:-}"
+    TIMEOUT="${2:-}"
+    shift 2
+    COMMAND=( "$@" )
+
+    if [[ -z "$LOCKDIR" ]]
+    then
+        echo "ERROR: no LOCKDIR specified"
+        exit 1
+    fi
+
+    if ! [[ $TIMEOUT =~ ^[[:digit:]]+$ ]]
+    then
+        echo "ERROR: invalid TIMEOUT '$TIMEOUT'"
+        exit 1
+    fi
+
+    if (( "${#COMMAND[@]}" < 1 ))
+    then
+        echo "ERROR: no COMMAND specified"
+        exit 1
+    fi
+
+    ############################################################
+    # If the 'flock' command is available, use it
+
+    if [[ -n "$( type -t flock )" ]]
+    then
+        flock -x -w "$TIMEOUT" "$LOCKDIR" "${COMMAND[@]}"
+
+    ############################################################
+    # Otherwise, fake it by creating a directory
+
+    else
+        while true
+        do
+            echo -en " $TIMEOUT \r"
+
+            ########################################
+            # If the directory already exists, mkdir (without '-p') throws
+            # an error. We need to wait until we're able to *create* the
+            # directory.
+
+            if mkdir "$LOCKDIR" 2>/dev/null
+            then
+                break
+            fi
+
+            ########################################
+            # The mkdir command failed. If the timeout has expired, throw
+            # an error.
+
+            if (( TIMEOUT < 1 ))
+            then
+                echo "ERROR: unable to acquire lock, cannot continue"
+                exit 1
+            fi
+            (( TIMEOUT -- ))
+
+            ########################################
+            # Sleep for one second, then try again
+
+            sleep 1
+            continue
+        done
+
+        ########################################
+        # Run the command
+
+        "${COMMAND[@]}"
+
+        ########################################
+        # Remove the directory
+        # - using 'rm -rf' instead of 'rmdir' in case some other process
+        #   came along and stored something there
+
+        rm -rf "$LOCKDIR"
+    fi
+}
+
+function unlockdir {
+    local LOCKDIR
+
+    LOCKDIR="${1:-}"
+
+    if [[ -z "$LOCKDIR" ]]
+    then
+        echo "ERROR: no LOCKDIR specified"
+        exit 1
+    fi
+
+    if ! [[ -d "$LOCKDIR" ]]
+    then
+        echo "ERROR: '$LOCKDIR' does not exist or is not a directory"
+        exit 1
+    fi
+
+    rm -r "$LOCKDIR"
+}
+
+###############################################################################
+###############################################################################
+###############################################################################
+#
+# example
+
+lockdir '/tmp/lockdir' 10 ls -la
+echo 'normal exit'
