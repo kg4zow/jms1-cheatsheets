@@ -4,8 +4,8 @@ syntax : perl
 #!/usr/bin/env perl
 #
 # script-name
-# Author <email> 2026-03-25
-my $LAST_UPDATED = '2026-07-07' ;
+# Author <email> 2026-03-25 Wed
+my $LAST_UPDATED = '2026-07-23 Thu' ;
 #
 # Brief description of what the script does
 #
@@ -52,6 +52,9 @@ require 5.005 ;
 use strict ;
 use warnings ;
 
+use utf8 ;
+use open qw( :std :encoding(UTF-8) ) ;
+
 use Getopt::Long qw ( GetOptionsFromArray :config require_order bundling ) ;
 
 ############################################################
@@ -82,51 +85,68 @@ sub coloured_line($@)
 {
     my $col = shift ;
     my $msg = join( '' , @_ ) ;
+    my $out = '' ;
 
     for my $line ( split( m|\r?\n| , $msg ) )
     {
-        printf "\e[0;%sm%s\e[K\e[0m\n" , $col , $line ;
+        $out .= sprintf( "\e[0;%sm%s\e[K\e[0m\n" , $col , $line ) ;
     }
+
+    return $out ;
 }
 
 sub redline(@)
 {
-    coloured_line( '0;1;37;41' , @_ ) ;
+    print coloured_line( '0;1;37;41' , @_ ) ;
 }
 
 sub yellowline(@)
 {
-    coloured_line( '0;30;43' , @_ ) ;
+    print coloured_line( '0;30;43' , @_ ) ;
 }
 
 sub blueline(@)
 {
-    coloured_line( '0;1;37;44' , @_ ) ;
+    print coloured_line( '0;1;37;44' , @_ ) ;
 }
 
 sub greenline(@)
 {
-    coloured_line( '0;1;37;42' , @_ ) ;
+    print coloured_line( '0;1;37;42' , @_ ) ;
 }
 
 sub cyanline(@)
 {
-    coloured_line( '0;1;37;46' , @_ ) ;
+    print coloured_line( '0;1;37;46' , @_ ) ;
 }
 
 sub purpleline(@)
 {
-    coloured_line( '0;1;37;45' , @_ ) ;
+    print coloured_line( '0;1;37;45' , @_ ) ;
 }
 
 sub whiteline(@)
 {
-    coloured_line( '0;1;37;47' , @_ ) ;
+    print coloured_line( '0;1;37;47' , @_ ) ;
 }
+
+###############################################################################
+#
+# Fail function.
+# - First arg is printed to STDERR in redline() style.
+# - Successive args (if any) are printed normally.
+# - Runs 'exit 1' to exit the entire program.
 
 sub fail(@)
 {
-    redline( @_ ) ;
+    my $line = ( shift || 'fail(): no fail message specified' ) ;
+    print STDERR coloured_line( '0;1;37;41' , $line ) ;
+
+    while ( $line = shift )
+    {
+        print STDERR $line ;
+    }
+
     exit 1 ;
 }
 
@@ -142,8 +162,8 @@ sub fail(@)
 # - The prefix is set using the global variable `$debug_prefix`.
 #   - If changing the prefix, be sure to include a space at the end, unless
 #     you want the messages "touching" the prefix.
-# - If the prefix is "\f" (formfeed), use the caller's "filename:line" as
-#   the prefix. I chose this value because ...
+# - The default prefix is "\f", which makes the function use the caller's
+#   "filename:line" as the prefix. I chose this value because ...
 #   - I wanted to be able to use the empty string for "no prefix"
 #   - I didn't want to use a non-ASCII character
 #   - It's not something I can see people wanting to use "for real"
@@ -171,7 +191,7 @@ sub debug(@)
 
         for my $line ( split( m|\r?\n| , $msg ) )
         {
-            yellowline "$pre$line" ;
+            print STDERR coloured_line( '0;30;43' , "$pre$line" ) ;
         }
     }
 }
