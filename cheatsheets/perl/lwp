@@ -1,0 +1,98 @@
+---
+syntax : perl
+---
+############################################################
+# Generic web client - create/use an LWP::UserAgent object
+# - functions that make web requests will call setup_ua() first
+
+use LWP ;
+
+my $ua       = undef ;
+my $ua_agent = 'test/0.1 ' ;
+my $ca_file  = '' ;
+my @ca_files =
+(
+    '/etc/pki/tls/cert.pem' ,
+    '/usr/local/etc/ca-certificates/cert.pem' ,
+) ;
+
+sub find_ca_file()
+{
+    $ca_file = '' ;
+
+    for my $f ( @ca_files )
+    {
+        if ( ( -f $f ) && ( -r $f ) )
+        {
+            $ca_file = $f ;
+            last ;
+        }
+    }
+
+    if ( $ca_file eq '' )
+    {
+        die "ERROR: unable to find a usable CA cert file\n" ;
+    }
+
+    return $ca_file ;
+}
+
+sub setup_ua()
+{
+    unless ( defined( $ua ) )
+    {
+        $ua = new LWP::UserAgent() ;
+        $ua->agent( $ua_agent ) ;
+
+        ########################################
+        # needed for SSL requests
+
+        $ua->ssl_opts(
+            verify_hostname => $ssl_verify ,
+            SSL_ca_file     => find_ca_file() ,
+        ) ;
+    }
+}
+
+############################################################
+# Send simple GET request
+
+setup_ua() ;
+$req = new HTTP::Request( 'GET' => $url ) ;
+if ( defined $token )
+{
+    $req->header( 'Authorization' , "Session $token" ) ;
+}
+
+$res = $ua->request( $req ) ;
+
+print $res->content() ;
+
+############################################################
+# Send POST request with JSON body
+
+use JSON ;
+
+my $url      = 'https://example.com/rest/xyzzy' ;
+my %req_json =
+(
+    'var1' => $val1 ,
+    'var2' => $val2 ,
+) ;
+
+setup_ua() ;
+$req = new HTTP::Request ( 'POST' => "$endpoint_url" ) ;
+$req->content_type( 'application/json' ) ;
+$req->content( encode_json( \%req_json ) ) ;
+
+$res = $ua->request( $req ) ;
+
+unless ( $res->is_success() )
+{
+    print "ERROR: login failed\n\n" ;
+    exit 1 ;
+}
+
+my $rj = decode_json( $res->content() ) ;
+$sid   = ( $rj->{'sid'}   || die "ERROR: login response contains no sid\n" ) ;
+$token = ( $rj->{'token'} || die "ERROR: login response contains no token\n" ) ;
