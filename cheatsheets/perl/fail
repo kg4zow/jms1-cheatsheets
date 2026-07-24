@@ -1,0 +1,13 @@
+---
+syntax : perl
+---
+###############################################################################
+#
+# Simple 'fail' function, without the rest of the coloured line functions
+
+sub fail(@)
+{
+    printf "\e[0;1;37;41m%s\e[K\e[0m\n" , join( '' , @_ ) ;
+    exit 1 ;
+}
+
