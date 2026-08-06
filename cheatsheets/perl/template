@@ -5,7 +5,7 @@ syntax : perl
 #
 # script-name
 # Author <email> 2026-03-25 Wed
-my $LAST_UPDATED = '2026-07-23 Thu' ;
+my $LAST_UPDATED = '2026-08-06 Thu' ;
 #
 # Brief description of what the script does
 #
@@ -55,7 +55,11 @@ use warnings ;
 use utf8 ;
 use open qw( :std :encoding(UTF-8) ) ;
 
-use Getopt::Long qw ( GetOptionsFromArray :config require_order bundling ) ;
+########################################
+# Normally you would only use one or the other
+
+use Getopt::Std ;
+#use Getopt::Long qw ( GetOptionsFromArray :config require_order bundling ) ;
 
 ############################################################
 # Variables meant to be configured by the end user
@@ -66,12 +70,14 @@ use Getopt::Long qw ( GetOptionsFromArray :config require_order bundling ) ;
 ############################################################
 # Global variables only set within the script
 
+my %opt         = () ;      # only needed if using Getopt::Std
+
 my $set_x       = 0 ;       # -x
-my $do_debug    = 0 ;       # --debug   or -D
-my $opt_a       = 0 ;       # --alfa    or -a
-my $opt_b       = 0 ;       # --bool    or -b, reset with --nobool or --no-bool
-my $opt_i       = 0 ;       # --int:    or -i:
-my $opt_s       = '' ;      # --string: or -s:
+my $do_debug    = 0 ;       # -D    or --debug
+my $opt_a       = 0 ;       # -a    or --alfa
+my $opt_b       = 0 ;       # -b    or --bool, reset with --nobool or --no-bool
+my $opt_i       = 0 ;       # -i:   or --int:
+my $opt_s       = '' ;      # -s:   or --string:
 
 ###############################################################################
 #
@@ -247,15 +253,33 @@ EOF
 #
 # Parse command line
 
-GetOptions(
-    'a|alfa'        => \$opt_a ,
-    'b|bool!'       => \$opt_b ,
-    'i|int=i'       => \$opt_i ,
-    's|string=s'    => \$opt_s ,
-    'x'             => \$set_x          ,
-    'D|debug'       => \$do_debug       ,
-    'h|help'        => sub{ usage() ; } ,
-) or usage "ERROR: GetOptions() failed\n" ;
+########################################
+# If using Getopt::Std
+
+getopts( 'o:xDh' , \%opt ) ;
+$opt{'h'} && usage() ;
+$opt_a      = ( $opt{'a'} ? 1 : 0 ) ;
+$opt_b      = ( $opt{'b'} ? 1 : 0 ) ;
+$opt_i      = ( $opt{'i'} || 0 ) ;
+$opt_s      = ( $opt{'s'} || '' ) ;
+$set_x      = ( $opt{'x'} ? 1 : 0 ) ;
+$do_debug   = ( $opt{'D'} ? 1 : 0 ) ;
+
+########################################
+# If using Getopt::Long
+#
+# GetOptions(
+#     'a|alfa'        => \$opt_a ,
+#     'b|bool!'       => \$opt_b ,
+#     'i|int=i'       => \$opt_i ,
+#     's|string=s'    => \$opt_s ,
+#     'x'             => \$set_x          ,
+#     'D|debug'       => \$do_debug       ,
+#     'h|help'        => sub{ usage() ; } ,
+# ) or usage "ERROR: GetOptions() failed\n" ;
+
+########################################
+# Either way
 
 $set_x |= $do_debug ;
 
