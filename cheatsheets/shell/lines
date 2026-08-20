@@ -96,3 +96,84 @@ function fail {
     redline "$@"
     exit 1
 }
+
+###############################################################################
+#
+# Coloured TEXT functions. Just print the string in colour AS-IS, without
+# worrying about complete lines. (Think '<span>' instead of '<div>'.)
+
+function coloured_text {
+    local COL MSG ITEM
+
+    ########################################
+    # The first parameter (required) is the 'n;n;n' code used in the escape
+    # sequence to set up the foreground and/or background colours.
+    #   ESC [ ___ m
+
+    COL="${1:?no colour code specified}"
+    shift
+
+    ########################################
+    # If any parameters remain (after shifting off the colour code), join
+    # them as a single string and print that in colour. Joining the strings
+    # is done using "$*", which means the input items will be separated by
+    # the first character of $IFS in the resulting "joined" string.
+
+    if (( $# > 0 ))
+    then
+        MSG="$*"
+        printf "\e[%sm%s\e[0m" "$COL" "$MSG"
+
+    ########################################
+    # Otherwise (if no more parameters exist), process STDIN.
+    # - All input will be joined into a single string, with newlines between
+    #   the input lines, but with no newline at the end.
+    # - That string will be printed, in the chosen colour.
+
+    else
+        MSG=''
+
+        while IFS='' read -r ITEM
+        do
+            if [[ -n "$MSG" ]]
+            then
+                MSG="$MSG"$'\n'
+            fi
+
+            MSG="$MSG$ITEM"
+        done
+
+        printf '\e[%sm%s\e[0m' "$COL" "$MSG"
+    fi
+}
+
+############################################################
+# Wrappers which specify different colours
+
+function redtext {
+    coloured_text '0;1;37;41' "$@"
+}
+
+function yellowtext {
+    coloured_text '0;30;43' "$@"
+}
+
+function bluetext {
+    coloured_text '0;1;37;44' "$@"
+}
+
+function greentext {
+    coloured_text '0;1;37;42' "$@"
+}
+
+function cyantext {
+    coloured_text '0;1;37;46' "$@"
+}
+
+function purpletext {
+    coloured_text '0;1;37;45' "$@"
+}
+
+function whitetext {
+    coloured_text '0;1;37;47' "$@"
+}
