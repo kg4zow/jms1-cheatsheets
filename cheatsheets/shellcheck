@@ -1,3 +1,17 @@
 # Disable a specific check for the following line
-  # shellcheck disable=SC9999
-  # shellcheck disable=SC9999 # explain why
+    # shellcheck disable=SC9999
+    # shellcheck disable=SC1111,SC2222
+    # shellcheck disable=SC9999 # reason for disabling
+
+# Disable check for entire file - must be first line after shebang
+    #!/bin/bash
+    # shellcheck disable=SC9999
+
+# Disable check for entire run
+shellcheck -e SC9999 filename
+
+# Disable a check forever - add to `$HOME/.shellcheckrc`
+disable=SC1111,SC2222
+
+# More info
+https://github.com/koalaman/shellcheck/wiki/Ignore
