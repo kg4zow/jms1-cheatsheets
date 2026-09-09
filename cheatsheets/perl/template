@@ -5,7 +5,7 @@ syntax : perl
 #
 # script-name
 # Author <email> 2026-03-25 Wed
-my $LAST_UPDATED = '2026-08-20 Thu' ;
+my $LAST_UPDATED = '2026-09-09 Wed' ;
 #
 # Brief description of what the script does
 #
@@ -103,37 +103,37 @@ sub coloured_line($@)
 
 sub redline(@)
 {
-    print coloured_line( '0;1;37;41' , @_ ) ;
+    print coloured_line( '1;37;41' , @_ ) ;
 }
 
 sub yellowline(@)
 {
-    print coloured_line( '0;30;43' , @_ ) ;
+    print coloured_line( '30;43' , @_ ) ;
 }
 
 sub blueline(@)
 {
-    print coloured_line( '0;1;37;44' , @_ ) ;
+    print coloured_line( '1;37;44' , @_ ) ;
 }
 
 sub greenline(@)
 {
-    print coloured_line( '0;1;37;42' , @_ ) ;
+    print coloured_line( '1;37;42' , @_ ) ;
 }
 
 sub cyanline(@)
 {
-    print coloured_line( '0;1;37;46' , @_ ) ;
+    print coloured_line( '1;37;46' , @_ ) ;
 }
 
 sub purpleline(@)
 {
-    print coloured_line( '0;1;37;45' , @_ ) ;
+    print coloured_line( '1;37;45' , @_ ) ;
 }
 
 sub whiteline(@)
 {
-    print coloured_line( '0;1;37;47' , @_ ) ;
+    print coloured_line( '1;37;47' , @_ ) ;
 }
 
 ###############################################################################
@@ -149,37 +149,37 @@ sub coloured_text($@)
 
 sub redtext(@)
 {
-    coloured_text( '0;1;37;41' , @_ ) ;
+    coloured_text( '1;37;41' , @_ ) ;
 }
 
 sub yellowtext(@)
 {
-    coloured_text( '0;30;43' , @_ ) ;
+    coloured_text( '30;43' , @_ ) ;
 }
 
 sub bluetext(@)
 {
-    coloured_text( '0;1;37;44' , @_ ) ;
+    coloured_text( '1;37;44' , @_ ) ;
 }
 
 sub greentext(@)
 {
-    coloured_text( '0;1;37;42' , @_ ) ;
+    coloured_text( '1;37;42' , @_ ) ;
 }
 
 sub cyantext(@)
 {
-    coloured_text( '0;1;37;46' , @_ ) ;
+    coloured_text( '1;37;46' , @_ ) ;
 }
 
 sub purpletext(@)
 {
-    coloured_text( '0;1;37;45' , @_ ) ;
+    coloured_text( '1;37;45' , @_ ) ;
 }
 
 sub whitetext(@)
 {
-    coloured_text( '0;1;37;47' , @_ ) ;
+    coloured_text( '1;37;47' , @_ ) ;
 }
 
 ###############################################################################
