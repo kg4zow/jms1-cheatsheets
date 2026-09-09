@@ -5,7 +5,7 @@ syntax  : bash
 #
 # script-name
 # Author <email@example.com> 2020-02-02 Mon
-readonly LAST_UPDATED="2026-08-20 Thu"
+readonly LAST_UPDATED="2026-09-09 Wed"
 #
 # Quick description of what the script does.
 #
@@ -132,10 +132,10 @@ function coloured_line {
             then
                 while IFS='' read -r LINE
                 do
-                    printf "\e[%sm%s\e[0K\e[0m\n" "$COL" "$LINE"
+                    printf "\e[0;%sm%s\e[0K\e[0m\n" "$COL" "$LINE"
                 done <<< "$P"
             else
-                printf "\e[%sm%s\e[0K\e[0m\n" "$COL" ''
+                printf "\e[0;%sm%s\e[0K\e[0m\n" "$COL" ''
             fi
         done
 
@@ -147,7 +147,7 @@ function coloured_line {
     else
         while IFS='' read -r LINE
         do
-            printf "\e[%sm%s\e[0K\e[0m\n" "$COL" "$LINE"
+            printf "\e[0;%sm%s\e[0K\e[0m\n" "$COL" "$LINE"
         done
     fi
 }
@@ -156,31 +156,31 @@ function coloured_line {
 # Wrappers which specify different colours
 
 function redline {
-    coloured_line '0;1;37;41' "$@"
+    coloured_line '1;37;41' "$@"
 }
 
 function yellowline {
-    coloured_line '0;30;43' "$@"
+    coloured_line '30;43' "$@"
 }
 
 function blueline {
-    coloured_line '0;1;37;44' "$@"
+    coloured_line '1;37;44' "$@"
 }
 
 function greenline {
-    coloured_line '0;1;37;42' "$@"
+    coloured_line '1;37;42' "$@"
 }
 
 function cyanline {
-    coloured_line '0;1;37;46' "$@"
+    coloured_line '1;37;46' "$@"
 }
 
 function purpleline {
-    coloured_line '0;1;37;45' "$@"
+    coloured_line '1;37;45' "$@"
 }
 
 function whiteline {
-    coloured_line '0;1;37;47' "$@"
+    coloured_line '1;37;47' "$@"
 }
 
 function fail {
@@ -213,7 +213,7 @@ function coloured_text {
     if (( $# > 0 ))
     then
         MSG="$*"
-        printf "\e[%sm%s\e[0m" "$COL" "$MSG"
+        printf "\e[0;%sm%s\e[0m" "$COL" "$MSG"
 
     ########################################
     # Otherwise (if no more parameters exist), process STDIN.
@@ -234,7 +234,7 @@ function coloured_text {
             MSG="$MSG$ITEM"
         done
 
-        printf '\e[%sm%s\e[0m' "$COL" "$MSG"
+        printf '\e[0;%sm%s\e[0m' "$COL" "$MSG"
     fi
 }
 
@@ -242,31 +242,31 @@ function coloured_text {
 # Wrappers which specify different colours
 
 function redtext {
-    coloured_text '0;1;37;41' "$@"
+    coloured_text '1;37;41' "$@"
 }
 
 function yellowtext {
-    coloured_text '0;30;43' "$@"
+    coloured_text '30;43' "$@"
 }
 
 function bluetext {
-    coloured_text '0;1;37;44' "$@"
+    coloured_text '1;37;44' "$@"
 }
 
 function greentext {
-    coloured_text '0;1;37;42' "$@"
+    coloured_text '1;37;42' "$@"
 }
 
 function cyantext {
-    coloured_text '0;1;37;46' "$@"
+    coloured_text '1;37;46' "$@"
 }
 
 function purpletext {
-    coloured_text '0;1;37;45' "$@"
+    coloured_text '1;37;45' "$@"
 }
 
 function whitetext {
-    coloured_text '0;1;37;47' "$@"
+    coloured_text '1;37;47' "$@"
 }
 
 ###############################################################################
