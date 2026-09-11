@@ -34,6 +34,8 @@ cheat x | pbcopy
 source <( cheat shell/lines )
 
 # My config - $HOME/.config/cheat/conf.yml
+# - note: if a cheatsheet file exists in multiple cheatpaths, the `cheat`
+#   command will show the LAST matching file
 editor: /PATH/TO/bbedit
 
 cheatpaths:
@@ -46,8 +48,3 @@ cheatpaths:
     path     : /Users/jms1/git/jms1-cheatsheets/cheatsheets
     tags     : [ jms1 ]
     readonly : false
-
-  - name     : voalte
-    path     : /keybase/team/voalte.common/cheatsheets
-    tags     : [ voalte ]
-    readonly : true
