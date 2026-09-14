@@ -2,7 +2,7 @@
 #
 # setup-cheat
 # jms1 2024-01-02
-readonly LAST_UPDATED='2026-03-19'
+readonly LAST_UPDATED='2026-09-14 Mon'
 #
 ###############################################################################
 #
@@ -107,6 +107,10 @@ function redline {
 
 function blueline {
     coloured_line '0;1;37;44' "$@"
+}
+
+function greenline {
+    coloured_line '1;37;42' "$@"
 }
 
 function cyanline {
@@ -222,15 +226,15 @@ fi
 #   https://github.com/cheat/cheat/issues/768
 # - keep going if the completion file can't be installed
 
-blueline "Writing shell completion file"
+blueline 'Checking shell completion file'
 
 CHEAT_VER="$( set_x cheat --version )"
-echo "cheat version $CHEAT_VER"
 
 if [[ "$CHEAT_VER" > 5 ]]
 then
     if [[ -d "$HOME/.bashrc.d" ]]
     then
+        greenline 'Writing shell completion file'
         set_x cheat --completion bash > "$HOME/.bashrc.d/82.cheat"
     else
         yellowline "Not writing shell completion file, '$HOME/.bashrc.d' is not a directory"
