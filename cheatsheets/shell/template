@@ -5,42 +5,51 @@ syntax  : bash
 #
 # script-name
 # Author <email@example.com> 2020-02-02 Mon
-readonly LAST_UPDATED="2026-09-09 Wed"
+LAST_UPDATED="2026-09-14 Mon"
 #
 # Quick description of what the script does.
 #
 ###############################################################################
 #
 # Portions of the script are from a template created by John Simpson, who has
-# released them under the MIT License.
+# released them under the following License.
 #
-# MIT License
+# BSD 3-Clause License (BSD-3-Clause)
+# https://spdx.org/licenses/BSD-3-Clause.html
 #
 # Copyright (C) 2025-2026 John Simpson
 #
-# Permission is hereby granted, free of charge, to any person obtaining a
-# copy of this software and associated documentation files (the "Software"),
-# to deal in the Software without restriction, including without limitation
-# the rights to use, copy, modify, merge, publish, distribute, sublicense,
-# and/or sell copies of the Software, and to permit persons to whom the
-# Software is furnished to do so, subject to the following conditions:
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
 #
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
+# 1. Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
 #
-# THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-# DEALINGS IN THE SOFTWARE.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+#
+# 3. Neither the name of the copyright holder nor the names of its
+#    contributors may be used to endorse or promote products derived from
+#    this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
 #
 ###############################################################################
 #
 # The remaining contents of the script are covered under this license:
 #
-# (License Name, i.e. "MIT License")
+# (License Name, i.e. "MIT License", etc.)
 #
 # Copyright (C) 2026 (Licensor Name)
 #
@@ -81,73 +90,187 @@ CONFIG_FILE="${CONFIG_DIR}/${MYNAME}.conf"
 
 ###############################################################################
 #
-# Lines from #START_INCLUDE to #END_INCLUDE can be "source'd" by interactive
-# shells to define these functions in those shells, by running a command like
-# this:
+# Colour values
 #
-#   source <( cheat shell/template | sed '1,/^#START_INCLUDE/ d;/^#END_INCLUDE/,$ d' )
+# A "colour value" is a sequence of digits and ';' characters which are used
+# in the SGR (aka "ESC [ ... m") ANSI sequence. These are control characters
+# that a computer can send to a terminal to make it print the following text
+# using specific visual attributes. For example, "ESC[0;1;37;44m" tells the
+# terminal:
+#   - ESC   is the ESCAPE character, ASCII value 27
+#   - [     means the following characters will form a command. The numbers
+#           which follow are held until the command itself is received.
+#   - 0     means to set the default visual state, usually normal white text
+#           on a black background
+#   - ;     separates the numbers from each other
+#   - 1     means to make the text bold
+#   - 37    means to make the text colour white (this combines with "bold")
+#   - 44    means to make the text background blue
+#   - m     is the command, telling the terminal that the sequence of numbers
+#           should be used to set how the text *after* the sequence should be
+#           shown on the display.
 #
-# I do this so that when I update the functions here, I don't have to *also*
-# update them in a separate file.
+# Pre-defined colour values
+#
+# These are used by the XXXline() and XXXtext() functions, and by the code
+# which processes the command line options.
+#
+# macOS uses bash 3.2.57, and earlier versions of bash (prior to 4.0) didn't
+# support associative arrays. Rather than forcing Mac users to get a better
+# shell (which I do recommend, even if this script doesn't *require* it), we
+# "fake it" by creating individual variables with a pattern to their name
+# (in this case "COLOUR_" followed by the name). The COLOUR_value() function
+# below uses this pattern to get the colour value for a given name.
+#
+# IN MOST CASES, these values should start with '0;', to ensure that any
+# attributes which may have been in effect before the sequence, are not
+# inherited by text printed after the sequence. However there may be cases
+# where you may *want* to inherit other attributes. Feel fre to do whatever
+# makes sense for you.
 
-#START_INCLUDE - see comments at top of file
+COLOUR_red='0;1;37;41'
+COLOUR_yellow='0;30;43'
+COLOUR_blue='0;1;37;44'
+COLOUR_green='0;1;37;42'
+COLOUR_cyan='0;1;37;46'
+COLOUR_purple='0;1;37;45'
+COLOUR_white='0;1;37;47'
+
+############################################################
+# Print (return) the value for a given colour.
+# - If the requested colour is already a colour value (i.e. '0;1;37;44'),
+#   just return that.
+# - Returns an empty string if the colour name is not known.
+
+function COLOUR_value {
+    local COL RE VAR RV
+
+    COL="$1"
+
+    RE='^[0-9][0-9;]*$'
+    if [[ $COL =~ $RE ]]
+    then
+        RV="$COL"
+    else
+        VAR="COLOUR_$COL"
+        RV="${!VAR}"
+    fi
+
+    echo "$RV"
+}
 
 ###############################################################################
 #
 # Coloured line functions
 
 ############################################################
-# Slice and dice a message into lines, print each line in the selected colour
-# - First parameter is the "n;n;n" value representing the foreground/background
-#   colour. It will be inserted into an "ESC [ ___ m" sequence.
-# - If more parmeters are present, they will be processsed.
-#   - Each parameter may be a single-line, multi-line, or empty string.
-# - If no more parameters are present, STDIN will be split into lines
-#   - empty lines in input will become blank coloured lines
-#   - empty STDIN will generate no output
+# Split a message into lines. Print each line in the selected colour.
+# - The first parameter specifies the colour. It can either be a recognized
+#   name (from a COLOUR_xxx variable), or the actual "n;n;n" value to be
+#   used in the "ESC [ ___ m" sequence before the message.
+# - IF the second parameter is '-d', the message(s) will be printed using
+#   double-height text. The '-d' parameter will be removed.
+# - If any more parmeters exist, they contain the message(s) to be printed.
+#   Each parameter may be a single-line, multi-line, or empty string. Any
+#   multi-line values will be split into separate lines. Any empty strings
+#   (including empty lines in a multi-line string) will cause empty lines to
+#   be printed.
+# - If no more parameters are present, the message will be read from STDIN.
+# - Resets the output to the "standard" colours afterward. This may be white
+#   on black, black on white, or some other colours defined in your terminal
+#   software.
+# - If STDIN is empty, no output will be generated - not even the "reset to
+#   standard" sequence.
 
 function coloured_line {
-    local COL P IFS LINE
+    local CSPEC COL DH P IFS LINE
 
     ########################################
-    # The first parameter (required) is the 'n;n;n' code used in the escape
-    # sequence to set up the foreground and/or background colours.
-    #   ESC [ ___ m
+    # The first parameter (required) specifies the colour value.
 
-    COL="${1:?no colour code specified}"
+    CSPEC="${1:-}"
     shift
 
+    if [[ -z "$CSPEC" ]]
+    then
+        fail "ERROR: coloured_line() called with no colour"
+    fi
+
     ########################################
-    # If any parameters remain (after shifting off the colour code),
-    # process each parameter.
-    # - Each parameter may be a single-line, multi-line, or empty string.
-    # - Split each parameter's value into lines.
-    # - Print each line, with the appropriate colour codes before/after it.
+    # Make sure the colour is recognized.
+
+    COL="$( COLOUR_value "$CSPEC" )"
+    if [[ -z "$COL" ]]
+    then
+        usage "ERROR: unknown colour '$CSPEC'"
+    fi
+
+    ########################################
+    # If the next parameter is '-d', the line should be double-height.
+
+    if [[ "$1" == '-d' ]]
+    then
+        DH=true
+        shift
+    else
+        DH=false
+    fi
+
+    ############################################################
+    # If any parameters remain, process them.
 
     if (( $# > 0 ))
     then
         for P in "$@"
         do
+            ########################################
+            # If the parameter is non-empty, split its value into lines and
+            # print each line with the appropriate escape codes.
+
             if [[ -n "$P" ]]
             then
                 while IFS='' read -r LINE
                 do
-                    printf "\e[0;%sm%s\e[0K\e[0m\n" "$COL" "$LINE"
+                    if $DH
+                    then
+                        printf "\e#3\e[%sm%s\e[0K\e[0m\n" "$COL" "$LINE"
+                        printf "\e#4\e[%sm%s\e[0K\e[0m\n" "$COL" "$LINE"
+                    else
+                        printf "\e[%sm%s\e[0K\e[0m\n" "$COL" "$LINE"
+                    fi
                 done <<< "$P"
+
+            ########################################
+            # The parameter is empty, print an empty line (in the selected
+            # colour).
+
             else
-                printf "\e[0;%sm%s\e[0K\e[0m\n" "$COL" ''
+                if $DH
+                then
+                    printf "\e#3\e[%sm%s\e[0K\e[0m\n" "$COL" "$LINE"
+                    printf "\e#4\e[%sm%s\e[0K\e[0m\n" "$COL" "$LINE"
+                else
+                    printf "\e[%sm%s\e[0K\e[0m\n" "$COL" ''
+                fi
             fi
         done
 
-    ########################################
-    # Otherwise (if no more parameters exist), process STDIN.
+    ############################################################
+    # Otherwise (if no more parameters exist), process lines from STDIN.
     # - Each line will be printed, with the appropriate colour codes.
     # - Empty lines are printed as empty strings, in the appropriate colour.
+    # - If STDIN is empty, nothing will be printed.
 
     else
         while IFS='' read -r LINE
         do
-            printf "\e[0;%sm%s\e[0K\e[0m\n" "$COL" "$LINE"
+            if $DH
+            then
+                printf "\e#3\e[%sm%s\e[0K\e[0m\n" "$COL" "$LINE"
+                printf "\e#4\e[%sm%s\e[0K\e[0m\n" "$COL" "$LINE"
+            else
+                printf "\e[%sm%s\e[0K\e[0m\n" "$COL" "$LINE"
+            fi
         done
     fi
 }
@@ -156,32 +279,36 @@ function coloured_line {
 # Wrappers which specify different colours
 
 function redline {
-    coloured_line '1;37;41' "$@"
+    coloured_line "$COLOUR_red" "$@"
 }
 
 function yellowline {
-    coloured_line '30;43' "$@"
+    coloured_line "$COLOUR_yellow" "$@"
 }
 
 function blueline {
-    coloured_line '1;37;44' "$@"
+    coloured_line "$COLOUR_blue" "$@"
 }
 
 function greenline {
-    coloured_line '1;37;42' "$@"
+    coloured_line "$COLOUR_green" "$@"
 }
 
 function cyanline {
-    coloured_line '1;37;46' "$@"
+    coloured_line "$COLOUR_cyan" "$@"
 }
 
 function purpleline {
-    coloured_line '1;37;45' "$@"
+    coloured_line "$COLOUR_purple" "$@"
 }
 
 function whiteline {
-    coloured_line '1;37;47' "$@"
+    coloured_line "$COLOUR_white" "$@"
 }
+
+############################################################
+# Convenience function - print an error message and exit the script. This
+# is similar to Perl's die() function.
 
 function fail {
     redline "$@"
@@ -192,17 +319,25 @@ function fail {
 #
 # Coloured TEXT functions. Just print the string in colour AS-IS, without
 # worrying about complete lines. (Think '<span>' instead of '<div>'.)
+#
+# Note that these functions do not support the '-d' for double-height text,
+# since the double-height flags are attached to an entire line rather than
+# specific characters.
 
 function coloured_text {
-    local COL MSG ITEM
+    local CSPEC COL MSG ITEM
 
     ########################################
-    # The first parameter (required) is the 'n;n;n' code used in the escape
-    # sequence to set up the foreground and/or background colours.
-    #   ESC [ ___ m
+    # The first parameter (required) specifies the colour value.
 
-    COL="${1:?no colour code specified}"
+    CSPEC="${1:?no colour code specified}"
     shift
+
+    COL="$( COLOUR_value "$CSPEC" )"
+    if [[ -z "$COL" ]]
+    then
+        usage "ERROR: unknown colour '$CSPEC'"
+    fi
 
     ########################################
     # If any parameters remain (after shifting off the colour code), join
@@ -213,7 +348,7 @@ function coloured_text {
     if (( $# > 0 ))
     then
         MSG="$*"
-        printf "\e[0;%sm%s\e[0m" "$COL" "$MSG"
+        printf "\e[%sm%s\e[0m" "$COL" "$MSG"
 
     ########################################
     # Otherwise (if no more parameters exist), process STDIN.
@@ -234,7 +369,7 @@ function coloured_text {
             MSG="$MSG$ITEM"
         done
 
-        printf '\e[0;%sm%s\e[0m' "$COL" "$MSG"
+        printf '\e[%sm%s\e[0m' "$COL" "$MSG"
     fi
 }
 
@@ -242,31 +377,31 @@ function coloured_text {
 # Wrappers which specify different colours
 
 function redtext {
-    coloured_text '1;37;41' "$@"
+    coloured_text "$COLOUR_red" "$@"
 }
 
 function yellowtext {
-    coloured_text '30;43' "$@"
+    coloured_text "$COLOUR_yellow" "$@"
 }
 
 function bluetext {
-    coloured_text '1;37;44' "$@"
+    coloured_text "$COLOUR_blue" "$@"
 }
 
 function greentext {
-    coloured_text '1;37;42' "$@"
+    coloured_text "$COLOUR_green" "$@"
 }
 
 function cyantext {
-    coloured_text '1;37;46' "$@"
+    coloured_text "$COLOUR_cyan" "$@"
 }
 
 function purpletext {
-    coloured_text '1;37;45' "$@"
+    coloured_text "$COLOUR_purple" "$@"
 }
 
 function whitetext {
-    coloured_text '1;37;47' "$@"
+    coloured_text "$COLOUR_white" "$@"
 }
 
 ###############################################################################
@@ -326,8 +461,6 @@ function debug {
         done
     fi
 }
-
-#END_INCLUDE - see comments about #START_INCLUDE above
 
 ###############################################################################
 #
