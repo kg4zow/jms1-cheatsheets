@@ -1,0 +1,14 @@
+# Update - RouterOS 6.x
+
+# Check for upgrades
+/system package update check-for-updates
+
+# Install available upgrades - this will reboot
+/system package update install
+
+# Check if new firmware is available
+/system routerboard print
+
+# If firmware upgrade is needed
+/system routerboard upgrade
+/system reboot
