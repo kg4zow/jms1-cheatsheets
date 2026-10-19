@@ -317,3 +317,5 @@ function whitetext {
     coloured_text "$COLOUR_white" "$@"
 }
 
+###############################################################################
+# SIMPLE versions are in 'shell/quicklines'

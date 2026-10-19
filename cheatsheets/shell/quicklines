@@ -1,0 +1,35 @@
+---
+syntax  : bash
+---
+# SIMPLE coloured line functions
+
+function redline {
+    printf "\e[0;1;37;41m%s\e[0K\e[0m\n" "$*"
+}
+
+function yellowline {
+    printf "\e[0;30;43m%s\e[0K\e[0m\n" "$*"
+}
+
+function blueline {
+    printf "\e[0;1;37;44m%s\e[0K\e[0m\n" "$*"
+}
+
+function greenline {
+    printf "\e[0;1;37;42m%s\e[0K\e[0m\n" "$*"
+}
+
+function cyanline {
+    printf "\e[0;1;37;46m%s\e[0K\e[0m\n" "$*"
+}
+
+function purpleline {
+    printf "\e[0;1;37;45m%s\e[0K\e[0m\n" "$*"
+}
+
+function whiteline {
+    printf "\e[0;1;37;47m%s\e[0K\e[0m\n" "$*"
+}
+
+###############################################################################
+# FULL versions are in 'shell/lines'
