@@ -31,3 +31,18 @@ function show_x {
         cyanline "$PS4$*" 1>&2
     fi
 }
+
+###############################################################################
+#
+# Simpler versions which *always* print, rather than only when $SET_X is true.
+
+function set_x {
+    local IFS=' '
+    echo "$PS4$*" 1>&2
+    "$@"
+}
+
+function show_x {
+    local IFS=' '
+    echo "$PS4$*" 1>&2
+}
