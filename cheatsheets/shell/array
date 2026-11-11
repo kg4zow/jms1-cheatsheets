@@ -156,3 +156,14 @@ a b c (3)
 ARRAY=( n "${ARRAY[@]:1}" )
 echo "${ARRAY[@]}" "(${#ARRAY[@]})"
 n a b c (4)
+
+############################################################
+# Join elements into a string, with a 0- or 1-character delimiter
+
+function join {
+    local IFS="${1:-}"
+    shift
+    echo "$*"
+}
+
+echo "ITEMS=[$( join , "${ITEMS[@]}" )]"
